@@ -25,10 +25,10 @@
                     :key="user.id"
                     @click="editUser(user)"
                 >
-                  <v-list-item-content>
+                  <v-list-item>
                     <v-list-item-title>{{ user.nombre }}</v-list-item-title>
                     <v-list-item-subtitle>{{ user.role }}</v-list-item-subtitle>
-                  </v-list-item-content>
+                  </v-list-item>
                   <v-list-item-action>
                     <v-btn icon color="red" @click.stop="deleteUser(user.id)">
                       <v-icon>mdi-delete</v-icon>
@@ -56,10 +56,10 @@
                     :key="employee.id"
                     @click="editEmployee(employee)"
                 >
-                  <v-list-item-content>
+                  <v-list-item>
                     <v-list-item-title>{{ employee.nombre }}</v-list-item-title>
                     <v-list-item-subtitle>{{ employee.correo }}</v-list-item-subtitle>
-                  </v-list-item-content>
+                  </v-list-item>
                   <v-list-item-action>
                     <v-btn icon color="red" @click.stop="deleteEmployee(employee.id)">
                       <v-icon>mdi-delete</v-icon>
@@ -134,7 +134,7 @@ export default {
     // Users Management
     async fetchUsers() {
       try {
-        const response = await axios.get("https://elitemedicalbajio.online/rh/users");
+        const response = await axios.get("https://elitemedicalbajio.online/rh/usuarios/get");
         this.users = response.data;
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -156,7 +156,7 @@ export default {
     // Employees Management
     async fetchEmployees() {
       try {
-        const response = await axios.get("https://elitemedicalbajio.online/rh/employees");
+        const response = await axios.get("https://elitemedicalbajio.online/rh/empleados/get");
         this.employees = response.data;
       } catch (error) {
         console.error("Error fetching employees:", error);
@@ -178,7 +178,7 @@ export default {
     // Vacation Requests Management
     async fetchVacationRequests() {
       try {
-        const response = await axios.get("https://elitemedicalbajio.online/rh/vacation-requests");
+        const response = await axios.get("https://elitemedicalbajio.online/rh/tipo_vacacion/get");
         this.vacationRequests = response.data;
       } catch (error) {
         console.error("Error fetching vacation requests:", error);
