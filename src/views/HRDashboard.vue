@@ -30,8 +30,9 @@
                     <v-list-item-subtitle>{{ user.role }}</v-list-item-subtitle>
                   </v-list-item>
                   <v-list-item-action class="justify-end">
-                    <v-btn icon color="red" @click.stop="deleteUser(user.id)">
+                    <v-btn  color="red" @click.stop="deleteUser(user.id)">
                       <v-icon>mdi-delete</v-icon>
+                      <span>BORRAR</span>
                     </v-btn>
                   </v-list-item-action>
                 </v-list-item>
@@ -61,8 +62,9 @@
                     <v-list-item-subtitle>{{ employee.correo }}</v-list-item-subtitle>
                   </v-list-item>
                   <v-list-item-action class="justify-end">
-                    <v-btn  icon color="red" @click.stop="deleteEmployee(employee.id)">
+                    <v-btn color="red" @click.stop="deleteEmployee(employee.id)">
                       <v-icon>mdi-delete</v-icon>
+                      <span>BORRAR</span>
                     </v-btn>
                   </v-list-item-action>
                 </v-list-item>
