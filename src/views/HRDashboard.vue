@@ -306,7 +306,7 @@ export default {
     // Fetch Roles
     async fetchRoles() {
       try {
-        const response = await axios.get("http://localhost:8082/rh/roles/get");
+        const response = await axios.get("https://elitemedicalbajio.online/rh/roles/get");
         this.roles = response.data;
       } catch (error) {
         console.error("Error fetching roles:", error);
@@ -315,7 +315,7 @@ export default {
     // Users Management
     async fetchUsers() {
       try {
-        const response = await axios.get("http://localhost:8082/rh/usuarios/get");
+        const response = await axios.get("https://elitemedicalbajio.online/rh/usuarios/get");
         this.users = response.data;
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -339,7 +339,7 @@ export default {
           empleado: { id: this.newUser.empleado }
         };
 
-        axios.post('http://localhost:8082/rh/usuarios/save', newUserDTO)
+        axios.post('https://elitemedicalbajio.online/rh/usuarios/save', newUserDTO)
             .then(response => {
               console.log('User saved:', response.data);
               this.fetchUsers();
@@ -372,7 +372,7 @@ export default {
           empleado: this.editingUser.empleado
         };
 
-        axios.post("http://localhost:8082/rh/usuarios/update", usuarioDTO)
+        axios.post("https://elitemedicalbajio.online/rh/usuarios/update", usuarioDTO)
             .then(response => {
               console.log('User updated successfully:', response.data);
               this.fetchUsers();
@@ -387,7 +387,7 @@ export default {
     },
     deleteUser(userId) {
       // Logic to delete a user
-      axios.delete(`http://localhost:8082/rh/usuarios/delete/${userId}`)
+      axios.delete(`https://elitemedicalbajio.online/rh/usuarios/delete/${userId}`)
           .then(() => {
             console.log('User deleted successfully');
             this.fetchUsers();
@@ -402,7 +402,7 @@ export default {
     // Employees Management
     async fetchEmployees() {
       try {
-        const response = await axios.get("http://localhost:8082/rh/empleados/get");
+        const response = await axios.get("https://elitemedicalbajio.online/rh/empleados/get");
         this.employees = response.data;
       } catch (error) {
         console.error("Error fetching employees:", error);
@@ -418,7 +418,7 @@ export default {
     },
     saveNewEmployee() {
       if (this.$refs.createEmployeeForm.validate()) {
-        axios.post('http://localhost:8082/rh/empleados/save', this.newEmployee)
+        axios.post('https://elitemedicalbajio.online/rh/empleados/save', this.newEmployee)
             .then(response => {
               console.log('Employee saved:', response.data);
               this.fetchEmployees(); // Refresh employee list
@@ -441,7 +441,7 @@ export default {
     },
     saveEmployeeChanges() {
       if (this.$refs.editEmployeeForm.validate()) {
-        axios.post('http://localhost:8082/rh/empleados/update', this.editingEmployee)
+        axios.post('https://elitemedicalbajio.online/rh/empleados/update', this.editingEmployee)
             .then(response => {
               console.log('Employee updated:', response.data);
               this.fetchEmployees(); // Refresh employee list
@@ -455,7 +455,7 @@ export default {
       }
     },
     deleteEmployee(employeeId) {
-      axios.delete(`http://localhost:8082/rh/empleados/delete/${employeeId}`)
+      axios.delete(`https://elitemedicalbajio.online/rh/empleados/delete/${employeeId}`)
           .then(() => {
             console.log('Employee deleted successfully');
             this.fetchEmployees(); // Refresh employee list
@@ -470,7 +470,7 @@ export default {
     // Vacation Requests Management
     async fetchVacationRequests() {
       try {
-        const response = await axios.get("http://localhost:8082/rh/vacaciones/get");
+        const response = await axios.get("https://elitemedicalbajio.online/rh/vacaciones/get");
         this.vacationRequests = response.data;
       } catch (error) {
         console.error("Error fetching vacation requests:", error);
@@ -487,7 +487,7 @@ export default {
       this.updateVacationStatus(request);
     },
     updateVacationStatus(request) {
-      axios.post("http://localhost:8082/rh/vacaciones/update", request)
+      axios.post("https://elitemedicalbajio.online/rh/vacaciones/update", request)
           .then(response => {
             console.log('Vacation request updated:', response.data);
             this.fetchVacationRequests(); // Refresh the list
