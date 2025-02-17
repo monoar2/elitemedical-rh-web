@@ -144,6 +144,57 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+
+        <!-- Modal for Creating Employee -->
+        <v-dialog v-model="createEmployeeModal" max-width="600px">
+          <v-card>
+            <v-card-title>
+              <span class="text-h5">Crear Empleado</span>
+            </v-card-title>
+            <v-card-text>
+              <v-form ref="createEmployeeForm">
+                <v-text-field v-model="newEmployee.nombre" label="Nombre" required></v-text-field>
+                <v-text-field v-model="newEmployee.apellidoPaterno" label="Apellido Paterno" required></v-text-field>
+                <v-text-field v-model="newEmployee.apellidoMaterno" label="Apellido Materno" required></v-text-field>
+                <v-text-field v-model="newEmployee.correo" label="Correo" type="email" required></v-text-field>
+                <v-text-field v-model="newEmployee.telefono" label="Teléfono" required></v-text-field>
+                <v-text-field v-model="newEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required></v-text-field>
+                <v-text-field v-model="newEmployee.diasPorEnfermedadDisponibles" label="Días por Enfermedad Disponibles" type="number" required></v-text-field>
+              </v-form>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="closeCreateEmployeeModal">Cerrar</v-btn>
+              <v-btn color="blue darken-1" text @click="saveNewEmployee">Guardar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <!-- Modal for Editing Employee -->
+        <v-dialog v-model="editEmployeeModal" max-width="600px">
+          <v-card>
+            <v-card-title>
+              <span class="text-h5">Editar Empleado</span>
+            </v-card-title>
+            <v-card-text>
+              <v-form ref="editEmployeeForm">
+                <v-text-field v-model="editingEmployee.nombre" label="Nombre" required></v-text-field>
+                <v-text-field v-model="editingEmployee.apellidoPaterno" label="Apellido Paterno" required></v-text-field>
+                <v-text-field v-model="editingEmployee.apellidoMaterno" label="Apellido Materno" required></v-text-field>
+                <v-text-field v-model="editingEmployee.correo" label="Correo" type="email" required></v-text-field>
+                <v-text-field v-model="editingEmployee.telefono" label="Teléfono" required></v-text-field>
+                <v-text-field v-model="editingEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required></v-text-field>
+                <v-text-field v-model="editingEmployee.diasPorEnfermedadDisponibles" label="Días por Enfermedad Disponibles" type="number" required></v-text-field>
+              </v-form>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="closeEditEmployeeModal">Cerrar</v-btn>
+              <v-btn color="blue darken-1" text @click="saveEmployeeChanges">Guardar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
       </v-row>
 
       <v-row>
@@ -232,6 +283,17 @@ export default {
         password: '',
         role: '',
         empleado: ''
+      },
+      createEmployeeModal: false,
+      editEmployeeModal: false,
+      newEmployee: {
+        nombre: '',
+        correo: ''
+      },
+      editingEmployee: {
+        id: null,
+        nombre: '',
+        correo: ''
       }
     };
   },
@@ -347,16 +409,62 @@ export default {
       }
     },
     createEmployee() {
-      // Logic to add a new employee
-      alert("Create Employee logic here");
+      this.createEmployeeModal = true;
+    },
+    closeCreateEmployeeModal() {
+      this.createEmployeeModal = false;
+      this.$refs.createEmployeeForm.reset();
+      this.newEmployee = { nombre: '', correo: '' };
+    },
+    saveNewEmployee() {
+      if (this.$refs.createEmployeeForm.validate()) {
+        axios.post('http://localhost:8082/rh/empleados/save', this.newEmployee)
+            .then(response => {
+              console.log('Employee saved:', response.data);
+              this.fetchEmployees(); // Refresh employee list
+              this.closeCreateEmployeeModal();
+              alert("Employee saved successfully!");
+            })
+            .catch(error => {
+              console.error('Error saving employee:', error);
+              alert("Failed to save employee!");
+            });
+      }
     },
     editEmployee(employee) {
-      // Logic to edit employee details
-      alert(`Edit Employee: ${employee.nombre}`);
+      this.editingEmployee = { ...employee };
+      this.editEmployeeModal = true;
+    },
+    closeEditEmployeeModal() {
+      this.editEmployeeModal = false;
+      this.$refs.editEmployeeForm.reset();
+    },
+    saveEmployeeChanges() {
+      if (this.$refs.editEmployeeForm.validate()) {
+        axios.post('http://localhost:8082/rh/empleados/update', this.editingEmployee)
+            .then(response => {
+              console.log('Employee updated:', response.data);
+              this.fetchEmployees(); // Refresh employee list
+              this.closeEditEmployeeModal();
+              alert("Employee updated successfully!");
+            })
+            .catch(error => {
+              console.error('Error updating employee:', error);
+              alert("Failed to update employee!");
+            });
+      }
     },
     deleteEmployee(employeeId) {
-      // Logic to delete an employee
-      alert(`Delete Employee with ID: ${employeeId}`);
+      axios.delete(`http://localhost:8082/rh/empleados/delete/${employeeId}`)
+          .then(() => {
+            console.log('Employee deleted successfully');
+            this.fetchEmployees(); // Refresh employee list
+            alert("Employee deleted successfully!");
+          })
+          .catch(error => {
+            console.error('Error deleting employee:', error);
+            alert("Failed to delete employee!");
+          });
     },
 
     // Vacation Requests Management
