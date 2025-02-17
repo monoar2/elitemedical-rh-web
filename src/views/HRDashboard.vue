@@ -13,7 +13,7 @@
         <v-col cols="12" md="6">
           <v-card>
             <v-card-title>
-              Manage Users
+              GESTIONAR USUARIOS
             </v-card-title>
             <v-card-text>
               <v-btn color="primary" class="mb-3" @click="createUser">
@@ -29,7 +29,7 @@
                     <v-list-item-title>{{ user.nombre }}</v-list-item-title>
                     <v-list-item-subtitle>{{ user.role }}</v-list-item-subtitle>
                   </v-list-item>
-                  <v-list-item-action>
+                  <v-list-item-action class="justify-end">
                     <v-btn icon color="red" @click.stop="deleteUser(user.id)">
                       <v-icon>mdi-delete</v-icon>
                     </v-btn>
@@ -44,7 +44,7 @@
         <v-col cols="12" md="6">
           <v-card>
             <v-card-title>
-              Manage Employees
+              GESTIONAR EMPLEADOS
             </v-card-title>
             <v-card-text>
               <v-btn color="primary" class="mb-3" @click="createEmployee">
@@ -60,8 +60,8 @@
                     <v-list-item-title>{{ employee.nombre }}</v-list-item-title>
                     <v-list-item-subtitle>{{ employee.correo }}</v-list-item-subtitle>
                   </v-list-item>
-                  <v-list-item-action>
-                    <v-btn icon color="red" @click.stop="deleteEmployee(employee.id)">
+                  <v-list-item-action class="justify-end">
+                    <v-btn  icon color="red" @click.stop="deleteEmployee(employee.id)">
                       <v-icon>mdi-delete</v-icon>
                     </v-btn>
                   </v-list-item-action>
@@ -77,7 +77,7 @@
         <v-col cols="12">
           <v-card>
             <v-card-title>
-              Vacation Requests
+              SOLICITUDES DE VACACIONES
             </v-card-title>
             <v-card-text>
               <v-data-table
@@ -95,14 +95,14 @@
                       text
                       @click="approveRequest(item.id)"
                   >
-                    Approve
+                    APROBAR
                   </v-btn>
                   <v-btn
                       color="red"
                       text
                       @click="rejectRequest(item.id)"
                   >
-                    Reject
+                    RECHAZAR
                   </v-btn>
                 </template>
                 <template v-slot:item.tipoVacacion="{ item }">
@@ -137,6 +137,11 @@ export default {
         { text: "Actions", value: "actions", sortable: false },
       ],
     };
+  },
+  watch: {
+    vacationHeaders(newVal) {
+      console.log('Headers changed:', newVal);
+    }
   },
   methods: {
     // Users Management
