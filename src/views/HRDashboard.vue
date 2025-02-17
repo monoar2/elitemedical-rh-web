@@ -119,6 +119,7 @@ export default {
     return {
       users: [], // List of users
       employees: [], // List of employees
+      vacationTypes: [],// List of vacation types
       vacationRequests: [], // List of vacation requests
       vacationHeaders: [
         { text: "Employee", value: "employee" },
@@ -178,7 +179,7 @@ export default {
     // Vacation Requests Management
     async fetchVacationRequests() {
       try {
-        const response = await axios.get("https://elitemedicalbajio.online/rh/tipo_vacacion/get");
+        const response = await axios.get("https://elitemedicalbajio.online/rh/vacaciones/get");
         this.vacationRequests = response.data;
       } catch (error) {
         console.error("Error fetching vacation requests:", error);
