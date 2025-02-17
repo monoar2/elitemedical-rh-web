@@ -42,6 +42,7 @@
 
 <script>
 import axios from 'axios';
+import { useEmployeeStore } from '@/store/employee';
 
 export default {
   data() {
@@ -54,18 +55,19 @@ export default {
   methods: {
     async login() {
       const endpoint = `https://elitemedicalbajio.online/rh/login?usuario=${encodeURIComponent(this.username)}&password=${encodeURIComponent(this.password)}`;
+      const employeeStore = useEmployeeStore();
 
       try {
         const response = await axios.post(endpoint);
 
         if (response.data.role.nombre === "admin") {
           this.$router.push('/hr-dashboard');
-        } else
-          if (response.data.role.nombre === "user") {
-            this.$router.push('/employee-dashboard');
-          } else {
-              alert('Invalid username or password.');
-            }
+        } else if (response.data.role.nombre === "user") {
+          employeeStore.setEmployee(response.data); // Save employee data in the store
+          this.$router.push('/employee-dashboard');
+        } else {
+          alert('Invalid username or password.');
+        }
       } catch (error) {
         console.error('Login error:', error);
         alert('An error occurred during login.');

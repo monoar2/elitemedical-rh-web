@@ -72,8 +72,17 @@
 
 <script>
 import axios from "axios";
+import { useEmployeeStore } from '@/store/employee';
+
 
 export default {
+  setup() {
+    const employeeStore = useEmployeeStore();
+
+    return {
+      employee: employeeStore.employee, // Reactive employee data
+    };
+  },
   data() {
     return {
       employee: {},
@@ -104,7 +113,7 @@ export default {
     },
     async loadVacationTypes() {
       try {
-        const response = await axios.get("https://elitemedicalbajio.online/rh/tipos-vacaciones");
+        const response = await axios.get("https://elitemedicalbajio.online/rh/tipo_vacacion/get");
         this.vacationTypes = response.data;
       } catch (error) {
         this.feedbackMessage = "Failed to load vacation types.";
