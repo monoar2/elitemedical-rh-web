@@ -86,6 +86,9 @@
                   item-value="id"
                   class="elevation-1"
               >
+                <template v-slot:item.empleado="{ item }">
+                  {{ item.empleado.nombre }} {{ item.empleado.apellidoPaterno }} {{ item.empleado.apellidoMaterno }}
+                </template>
                 <template v-slot:item.actions="{ item }">
                   <v-btn
                       color="green"
@@ -101,6 +104,10 @@
                   >
                     Reject
                   </v-btn>
+                </template>
+                <template v-slot:item.tipoVacacion="{ item }">
+                  {{ item.tipoVacacion.descripcion }}
+                  {{ item.tipoVacacion.conGoceDeSueldo ? '(Con Goce de Sueldo)' : '(Sin Goce de Sueldo)' }}
                 </template>
               </v-data-table>
             </v-card-text>
@@ -122,7 +129,7 @@ export default {
       vacationTypes: [],// List of vacation types
       vacationRequests: [], // List of vacation requests
       vacationHeaders: [
-        { text: "Employee", value: "employee" },
+        { text: "Employee", value: "empleado" },
         { text: "Start Date", value: "fechaInicio" },
         { text: "End Date", value: "fechaFin" },
         { text: "Type", value: "tipoVacacion" },
@@ -198,6 +205,7 @@ export default {
     this.fetchUsers();
     this.fetchEmployees();
     this.fetchVacationRequests();
+    console.log('Headers:', this.vacationHeaders);
   },
 };
 </script>
@@ -206,5 +214,9 @@ export default {
 /* Add any custom styling here */
 .v-card {
   margin-bottom: 20px;
+}
+.v-data-table thead th {
+  color: #000; /* Black text color for headers */
+  background-color: #f5f5f5; /* Light grey background for headers */
 }
 </style>
