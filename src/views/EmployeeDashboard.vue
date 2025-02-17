@@ -9,21 +9,21 @@
           <v-card-subtitle>
             <v-row>
               <v-col>
-                <v-label>Name:</v-label> {{ employee.nombre }} {{ employee.apellidoPaterno }} {{ employee.apellidoMaterno }}
+                <v-label>Name:</v-label> {{ employee.empleado.nombre }} {{ employee.empleado.apellidoPaterno }} {{ employee.empleado.apellidoMaterno }}
               </v-col>
               <v-col>
-                <v-label>Email:</v-label> {{ employee.correo }}
+                <v-label>Email:</v-label> {{ employee.empleado.correo }}
               </v-col>
               <v-col>
-                <v-label>Phone:</v-label> {{ employee.telefono }}
+                <v-label>Phone:</v-label> {{ employee.empleado.telefono }}
               </v-col>
             </v-row>
             <v-row>
               <v-col>
-                <v-label>Vacation Days Available:</v-label> {{ employee.vacacionesDisponibles }}
+                <v-label>Vacation Days Available:</v-label> {{ employee.empleado.vacacionesDisponibles }}
               </v-col>
               <v-col>
-                <v-label>Sick Days Available:</v-label> {{ employee.diasPorEnfermedadDisponibles }}
+                <v-label>Sick Days Available:</v-label> {{ employee.empleado.diasPorEnfermedadDisponibles }}
               </v-col>
             </v-row>
           </v-card-subtitle>
@@ -42,7 +42,7 @@
               <v-select
                   v-model="selectedVacationType"
                   :items="vacationTypes"
-                  item-text="nombre"
+                  item-title="descripcion"
                   item-value="id"
                   label="Vacation Type"
               />
@@ -76,16 +76,11 @@ import { useEmployeeStore } from '@/store/employee';
 
 
 export default {
-  setup() {
+  data() {
     const employeeStore = useEmployeeStore();
 
     return {
       employee: employeeStore.employee, // Reactive employee data
-    };
-  },
-  data() {
-    return {
-      employee: {},
       vacationTypes: [],
       vacationList: [],
       startDate: null,
@@ -104,7 +99,7 @@ export default {
   methods: {
     async loadEmployee() {
       try {
-        const response = await axios.get(`https://elitemedicalbajio.online/rh/empleados/get/${this.employee.id}`);
+        const response = await axios.get(`https://elitemedicalbajio.online/rh/empleados/get/${employeeStore.employee.empleado.id}`);
         this.employee = response.data;
       } catch (error) {
         this.feedbackMessage = "Failed to load employee data.";
@@ -115,6 +110,8 @@ export default {
       try {
         const response = await axios.get("https://elitemedicalbajio.online/rh/tipo_vacacion/get");
         this.vacationTypes = response.data;
+        this.$set(this, 'vacationTypes', response.data);
+
       } catch (error) {
         this.feedbackMessage = "Failed to load vacation types.";
         this.feedbackType = "error";
@@ -123,7 +120,7 @@ export default {
     async loadVacations() {
       try {
         const response = await axios.get(
-            `https://elitemedicalbajio.online/rh/vacaciones/empleado/${this.employee.id}`
+            `https://elitemedicalbajio.online/rh/vacaciones/empleado/${this.employee.empleado.id}`
         );
         this.vacationList = response.data;
       } catch (error) {
@@ -146,7 +143,7 @@ export default {
 
       try {
         const request = {
-          empleado: { id: this.employee.id },
+          empleado: { id: this.employee.empleado.id },
           tipoVacacion: { id: this.selectedVacationType },
           fechaInicio: this.startDate,
           fechaFin: this.endDate,
@@ -174,7 +171,15 @@ export default {
     await this.loadEmployee();
     await this.loadVacationTypes();
     await this.loadVacations();
+
+    console.log('Vacation Types:', this.vacationTypes);
+
   },
+  watch: {
+    selectedVacationType(newVal) {
+      console.log('Selected Vacation Type:', newVal);
+    }
+  }
 };
 </script>
 
