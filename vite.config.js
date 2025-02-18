@@ -21,4 +21,5 @@ export default defineConfig({
   server: {
     allowedHosts: ['elitemedicalbajio.online']
   },
+  base: '/herramientas/',
 })
