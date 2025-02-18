@@ -6,7 +6,7 @@ import HRDashboard from "@/views/HRDashboard.vue";
 
 const routes = [
     {
-        path: '/',
+        path: '/login',
         name: 'Login',
         component: Login,
     },
