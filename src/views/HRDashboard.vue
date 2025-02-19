@@ -1,40 +1,39 @@
 <template>
   <v-app>
     <v-container fluid>
-      <v-row class="mb-5">
+      <v-row class="mb-5 justify-center">
         <v-col cols="12" class="text-center">
-          <h1>HR Dashboard</h1>
-          <p>Welcome, HR Manager!</p>
+          <h1 class="display-1 primary--text">HR Dashboard</h1>
+          <p class="subtitle-1">Welcome, HR Manager!</p>
         </v-col>
       </v-row>
 
       <v-row>
         <!-- Users Section -->
-        <v-col cols="12" md="6">
-          <v-card>
-            <v-card-title>
-              GESTIONAR USUARIOS
-            </v-card-title>
+        <v-col cols="12" md="6" class="pa-4">
+          <v-card class="elevation-10">
+            <v-card-title class="headline primary--text text-center">GESTIONAR USUARIOS</v-card-title>
             <v-card-text>
-              <v-btn color="primary" class="mb-3" @click="openCreateUserModal">
-                Create New User
+              <v-btn color="primary" class="mb-6 elevation-2" @click="openCreateUserModal">
+                <v-icon left>mdi-plus</v-icon> Create New User
               </v-btn>
-              <v-list>
+              <v-list two-line>
+                <v-divider></v-divider>
                 <v-list-item
                     v-for="user in users"
                     :key="user.id"
                     @click="editUser(user)"
                 >
-                  <v-list-item>
+                  <v-list-item-content>
                     <v-list-item-title>{{ user.nombre }}</v-list-item-title>
-                    <v-list-item-subtitle>{{ user.role }}</v-list-item-subtitle>
-                  </v-list-item>
-                  <v-list-item-action class="justify-end">
-                    <v-btn color="red" @click.stop="deleteUser(user.id)">
-                      <v-icon>mdi-delete</v-icon>
-                      <span>BORRAR</span>
+                    <v-list-item-subtitle>{{ user.role.nombre }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                  <v-list-item-action>
+                    <v-btn icon @click.stop="deleteUser(user.id)">
+                      <v-icon color="red">mdi-delete</v-icon>
                     </v-btn>
                   </v-list-item-action>
+                  <v-divider></v-divider>
                 </v-list-item>
               </v-list>
             </v-card-text>
@@ -42,72 +41,70 @@
         </v-col>
 
         <!-- Employees Section -->
-        <v-col cols="12" md="6">
-          <v-card>
-            <v-card-title>
-              GESTIONAR EMPLEADOS
-            </v-card-title>
+        <v-col cols="12" md="6" class="pa-4">
+          <v-card class="elevation-10">
+            <v-card-title class="headline primary--text text-center">GESTIONAR EMPLEADOS</v-card-title>
             <v-card-text>
-              <v-btn color="primary" class="mb-3" @click="createEmployee">
-                Add New Employee
+              <v-btn color="primary" class="mb-6 elevation-2" @click="createEmployee">
+                <v-icon left>mdi-account-plus</v-icon> Add New Employee
               </v-btn>
-              <v-list>
+              <v-list two-line>
+                <v-divider></v-divider>
                 <v-list-item
                     v-for="employee in employees"
                     :key="employee.id"
                     @click="editEmployee(employee)"
                 >
-                  <v-list-item>
-                    <v-list-item-title>{{ employee.nombre }}</v-list-item-title>
+                  <v-list-item-content>
+                    <v-list-item-title>{{ employee.nombre }} {{ employee.apellidoPaterno }} {{ employee.apellidoMaterno }}</v-list-item-title>
                     <v-list-item-subtitle>{{ employee.correo }}</v-list-item-subtitle>
-                  </v-list-item>
-                  <v-list-item-action class="justify-end">
-                    <v-btn color="red" @click.stop="deleteEmployee(employee.id)">
-                      <v-icon>mdi-delete</v-icon>
-                      <span>BORRAR</span>
+                  </v-list-item-content>
+                  <v-list-item-action>
+                    <v-btn icon @click.stop="deleteEmployee(employee.id)">
+                      <v-icon color="red">mdi-delete</v-icon>
                     </v-btn>
                   </v-list-item-action>
+                  <v-divider></v-divider>
                 </v-list-item>
               </v-list>
             </v-card-text>
           </v-card>
         </v-col>
+      </v-row>
 
-        <!-- Modal for Editing User -->
-        <v-dialog v-model="editUserModal" max-width="600px">
-          <v-card>
-            <v-card-title>
-              <span class="text-h5">Editar Usuario</span>
-            </v-card-title>
-            <v-card-text>
-              <v-form ref="editUserForm">
-                <v-text-field v-model="editingUser.nombre" label="Nombre" required></v-text-field>
-                <v-text-field v-model="editingUser.password" label="Contraseña" type="password" required></v-text-field>
-                <v-select
-                    v-model="editingUser.role"
-                    :items="roles"
-                    item-title="nombre"
-                    item-value="id"
-                    label="Rol del usuario"
-                    required
-                ></v-select>
-                <v-select
-                    v-model="editingUser.empleado"
-                    :items="employees"
-                    item-title="nombre"
-                    item-value="id"
-                    label="Empleado para asociar al usuario"
-                    required
-                ></v-select>
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeEditUserModal">Cerrar</v-btn>
-              <v-btn color="blue darken-1" text @click="saveUserChanges">Guardar</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+      <!-- Modals -->
+      <v-dialog v-model="editUserModal" max-width="600px">
+        <v-card>
+          <v-card-title class="headline primary--text">Editar Usuario</v-card-title>
+          <v-card-text>
+            <v-form ref="editUserForm">
+              <v-text-field v-model="editingUser.nombre" label="Nombre" required></v-text-field>
+              <v-text-field v-model="editingUser.password" label="Contraseña" type="password" required></v-text-field>
+              <v-select
+                  v-model="editingUser.role"
+                  :items="roles"
+                  item-title="nombre"
+                  item-value="id"
+                  label="Rol del usuario"
+                  required
+              ></v-select>
+              <v-select
+                  v-model="editingUser.empleado"
+                  :items="employees"
+                  item-title="nombre"
+                  item-value="id"
+                  label="Empleado para asociar al usuario"
+                  required
+              ></v-select>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeEditUserModal">Cerrar</v-btn>
+            <v-btn color="blue darken-1" text @click="saveUserChanges">Guardar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
         <!-- Modal for Creating User -->
         <v-dialog v-model="createUserModal" max-width="600px">
@@ -195,22 +192,29 @@
           </v-card>
         </v-dialog>
 
-      </v-row>
 
       <v-row>
         <!-- Vacation Requests Section -->
-        <v-col cols="12">
-          <v-card>
-            <v-card-title>
-              SOLICITUDES DE VACACIONES
-            </v-card-title>
+        <v-col cols="12" class="pa-4">
+          <v-card class="elevation-10">
+            <v-card-title class="headline primary--text text-center">SOLICITUDES DE VACACIONES</v-card-title>
             <v-card-text>
               <v-data-table
                   :headers="vacationHeaders"
                   :items="vacationRequests"
                   item-value="id"
                   class="elevation-1"
+                  dense
               >
+                <template v-slot:header="{ props }">
+                  <thead>
+                  <tr>
+                    <th v-for="header in props.headers" :key="header.value" class="text-uppercase primary--text">
+                      {{ header.text }}
+                    </th>
+                  </tr>
+                  </thead>
+                </template>
                 <template v-slot:item.empleado="{ item }">
                   {{ item.empleado.nombre }} {{ item.empleado.apellidoPaterno }} {{ item.empleado.apellidoMaterno }}
                 </template>
@@ -234,10 +238,11 @@
                 </template>
                 <template v-slot:item.tipoVacacion="{ item }">
                   {{ item.tipoVacacion.descripcion }}
-                  {{ item.tipoVacacion.conGoceDeSueldo ? '(Con Goce de Sueldo)' : '(Sin Goce de Sueldo)' }}
+                  <span v-if="item.tipoVacacion.conGoceDeSueldo">(Con Goce de Sueldo)</span>
+                  <span v-else>(Sin Goce de Sueldo)</span>
                 </template>
                 <template v-slot:item.estatus="{ item }">
-                  {{ item.estauts }}
+                  {{ item.estauts || 'Pendiente' }}
                 </template>
               </v-data-table>
             </v-card-text>
@@ -245,15 +250,34 @@
         </v-col>
       </v-row>
 
-      <!-- ... rest of the template ... -->
+      <v-dialog v-model="confirmDeleteDialog" max-width="290">
+        <v-card>
+          <v-card-title class="headline">Confirm Delete</v-card-title>
+          <v-card-text>Are you sure you want to delete this {{ itemToDelete.type }}?</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="dark" text @click="confirmDeleteDialog = false">Cancel</v-btn>
+            <v-btn color="red darken-1" text @click="confirmDelete">Delete</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </v-app>
 </template>
 
 <script>
 import axios from "axios";
+import { VDialog, VCard, VCardTitle, VCardText, VCardActions, VBtn } from 'vuetify/components';
 
 export default {
+  components: {
+    VDialog,
+    VCard,
+    VCardTitle,
+    VCardText,
+    VCardActions,
+    VBtn
+  },
   data() {
     return {
       users: [], // List of users
@@ -266,7 +290,7 @@ export default {
         { text: "Start Date", value: "fechaInicio" },
         { text: "End Date", value: "fechaFin" },
         { text: "Type", value: "tipoVacacion" },
-        { text: "Estatus", value: "estatus" },
+        { text: "Status", value: "estatus" },
         { text: "Actions", value: "actions", sortable: false },
       ],
       editUserModal: false,
@@ -288,13 +312,25 @@ export default {
       editEmployeeModal: false,
       newEmployee: {
         nombre: '',
-        correo: ''
+        apellidoPaterno: '',
+        apellidoMaterno: '',
+        correo: '',
+        telefono: '',
+        vacacionesDisponibles: 0,
+        diasPorEnfermedadDisponibles: 0
       },
       editingEmployee: {
         id: null,
         nombre: '',
-        correo: ''
-      }
+        apellidoPaterno: '',
+        apellidoMaterno: '',
+        correo: '',
+        telefono: '',
+        vacacionesDisponibles: 0,
+        diasPorEnfermedadDisponibles: 0
+      },
+      confirmDeleteDialog: false,
+      itemToDelete: null
     };
   },
   watch: {
@@ -385,19 +421,6 @@ export default {
             });
       }
     },
-    deleteUser(userId) {
-      // Logic to delete a user
-      axios.delete(`https://elitemedicalbajio.online/rh/usuarios/delete/${userId}`)
-          .then(() => {
-            console.log('User deleted successfully');
-            this.fetchUsers();
-            alert("User deleted successfully!");
-          })
-          .catch(error => {
-            console.error('Error deleting user:', error);
-            alert("Failed to delete user!");
-          });
-    },
 
     // Employees Management
     async fetchEmployees() {
@@ -454,17 +477,37 @@ export default {
             });
       }
     },
+    deleteUser(userId) {
+      this.itemToDelete = { type: 'user', id: userId };
+      this.confirmDeleteDialog = true;
+    },
     deleteEmployee(employeeId) {
-      axios.delete(`https://elitemedicalbajio.online/rh/empleados/delete/${employeeId}`)
-          .then(() => {
-            console.log('Employee deleted successfully');
-            this.fetchEmployees(); // Refresh employee list
-            alert("Employee deleted successfully!");
-          })
-          .catch(error => {
-            console.error('Error deleting employee:', error);
-            alert("Failed to delete employee!");
-          });
+      this.itemToDelete = { type: 'employee', id: employeeId };
+      this.confirmDeleteDialog = true;
+    },
+    confirmDelete() {
+      if (this.itemToDelete.type === 'user') {
+        axios.delete(`https://elitemedicalbajio.online/rh/usuarios/delete/${this.itemToDelete.id}`)
+            .then(() => {
+              this.fetchUsers(); // Refresh the users list
+              alert("User deleted successfully!");
+            })
+            .catch(() => {
+              console.error('Error deleting user');
+              alert("Failed to delete user!");
+            });
+      } else if (this.itemToDelete.type === 'employee') {
+        axios.delete(`https://elitemedicalbajio.online/rh/empleados/delete/${this.itemToDelete.id}`)
+            .then(() => {
+              this.fetchEmployees(); // Refresh the employees list
+              alert("Employee deleted successfully!");
+            })
+            .catch(() => {
+              console.error('Error deleting employee');
+              alert("Failed to delete employee!");
+            });
+      }
+      this.confirmDeleteDialog = false;
     },
 
     // Vacation Requests Management
@@ -510,12 +553,34 @@ export default {
 </script>
 
 <style>
-/* Add any custom styling here */
 .v-card {
-  margin-bottom: 20px;
+  border-radius: 8px;
 }
+
+.v-card-title {
+  background-color: #E3F2FD;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.v-btn--icon {
+  margin-left: 8px;
+}
+
+.v-list-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
 .v-data-table thead th {
-  color: #000; /* Black text color for headers */
-  background-color: #f5f5f5; /* Light grey background for headers */
+  background-color: #BBDEFB !important;
+  color: #000 !important;
+  font-weight: bold;
+}
+
+.v-data-table tbody tr:nth-child(even) {
+  background-color: #E3F2FD;
+}
+
+.v-btn--text {
+  text-transform: uppercase;
 }
 </style>
