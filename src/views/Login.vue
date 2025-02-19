@@ -2,14 +2,18 @@
   <v-app>
     <v-container class="d-flex justify-center align-center" style="height: 100vh; background: linear-gradient(45deg, #2196f3, #4caf50);">
       <v-card elevation="10" max-width="400" class="rounded-3 shadow-lg">
-        <v-card-title class="text-h5 text-left py-4">
-         Dashoard EliteMedical Bajio RH
+        <!-- Add the logo -->
+        <div class="text-center py-4">
+          <img src="@/assets/img.png" alt="EliteMedical Bajio Logo" width="150" />
+        </div>
+        <v-card-title class="text-h6 text-center py-4">
+          Tablero de gestion de empleados
         </v-card-title>
         <v-card-text>
           <v-form ref="form" v-model="valid">
             <v-text-field
                 v-model="username"
-                label="Username"
+                label="USUARIO"
                 outlined
                 dense
                 color="primary"
@@ -18,7 +22,7 @@
             ></v-text-field>
             <v-text-field
                 v-model="password"
-                label="Password"
+                label="CONTRASEÑA"
                 outlined
                 dense
                 color="primary"

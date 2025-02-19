@@ -1,10 +1,14 @@
 <template>
   <v-app>
+    <!-- Top Bar -->
+
+
     <v-container fluid>
       <v-row class="mb-5 justify-center">
         <v-col cols="12" class="text-center">
-          <h1 class="display-1 primary--text">HR Dashboard</h1>
-          <p class="subtitle-1">Welcome, HR Manager!</p>
+
+          <h1 class="display-1 primary--text">TABLERO DE RH</h1>
+          <p class="subtitle-1">Bienvenido, RH administrativo!</p>
         </v-col>
       </v-row>
 
@@ -15,7 +19,7 @@
             <v-card-title class="headline primary--text text-center">GESTIONAR USUARIOS</v-card-title>
             <v-card-text>
               <v-btn color="primary" class="mb-6 elevation-2" @click="openCreateUserModal">
-                <v-icon left>mdi-plus</v-icon> Create New User
+                <v-icon left>mdi-plus</v-icon> Crear usuario
               </v-btn>
               <v-list two-line>
                 <v-divider></v-divider>
@@ -46,7 +50,7 @@
             <v-card-title class="headline primary--text text-center">GESTIONAR EMPLEADOS</v-card-title>
             <v-card-text>
               <v-btn color="primary" class="mb-6 elevation-2" @click="createEmployee">
-                <v-icon left>mdi-account-plus</v-icon> Add New Employee
+                <v-icon left>mdi-account-plus</v-icon> Crear Empleado
               </v-btn>
               <v-list two-line>
                 <v-divider></v-divider>
@@ -267,7 +271,7 @@
 
 <script>
 import axios from "axios";
-import { VDialog, VCard, VCardTitle, VCardText, VCardActions, VBtn } from 'vuetify/components';
+import { VDialog, VCard, VCardTitle, VCardText, VCardActions, VBtn, VAppBar, VToolbarTitle, VSpacer, VAvatar } from 'vuetify/components';import { useEmployeeStore } from '@/store/employee';
 
 export default {
   components: {
@@ -276,7 +280,11 @@ export default {
     VCardTitle,
     VCardText,
     VCardActions,
-    VBtn
+    VBtn,
+    VAppBar,
+    VToolbarTitle,
+    VSpacer,
+    VAvatar
   },
   data() {
     return {
@@ -332,6 +340,12 @@ export default {
       confirmDeleteDialog: false,
       itemToDelete: null
     };
+  },
+  computed: {
+    currentUser() {
+      const employeeStore = useEmployeeStore();
+      return employeeStore.employee;
+    }
   },
   watch: {
     vacationHeaders(newVal) {
@@ -540,6 +554,11 @@ export default {
             console.error('Error updating vacation request:', error);
             alert("Failed to update vacation request!");
           });
+    },
+    logout() {
+      const employeeStore = useEmployeeStore();
+      employeeStore.clearEmployee(); // Clear user data from the store
+      this.$router.push('/login'); // Redirect to login page after logout
     },
   },
   created() {

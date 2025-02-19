@@ -8,5 +8,11 @@ export const useEmployeeStore = defineStore('employee', {
         setEmployee(data) {
             this.employee = data;
         },
+        clearEmployee() {
+            this.employee = null;
+        },
+    },
+    getters: {
+        getEmployee: (state) => state.employee,
     },
 });
