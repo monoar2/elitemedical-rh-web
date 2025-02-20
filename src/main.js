@@ -7,6 +7,7 @@ import * as directives from 'vuetify/directives'
 import 'vuetify/styles'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import { createPinia } from 'pinia';
+import {useEmployeeStore} from "@/store/employee.js";
 
 // Theme configuration
 const theme = {
@@ -55,9 +56,13 @@ const vuetify = createVuetify({
 });
 
 const pinia = createPinia();
-
 const app = createApp(App);
+
 app.use(router);
 app.use(pinia);
+
+const employeeStore = useEmployeeStore();
+employeeStore.loadSession();
+
 app.use(vuetify);
 app.mount('#app');

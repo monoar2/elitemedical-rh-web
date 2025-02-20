@@ -2,12 +2,11 @@
   <v-app>
     <v-container class="d-flex justify-center align-center" style="height: 100vh; background: linear-gradient(45deg, #2196f3, #4caf50);">
       <v-card elevation="10" max-width="400" class="rounded-3 shadow-lg">
-        <!-- Add the logo -->
         <div class="text-center py-4">
-          <img src="@/assets/img.png" alt="EliteMedical Bajio Logo" width="150" />
+          <img src="@/assets/Logo_Degradados.png" alt="EliteMedical Bajio Logo" width="150" />
         </div>
         <v-card-title class="text-h6 text-center py-4">
-          Tablero de gestion de empleados
+          Tablero de gestión de empleados
         </v-card-title>
         <v-card-text>
           <v-form ref="form" v-model="valid">
@@ -37,7 +36,7 @@
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions class="justify-center py-3">
-          <v-btn text small color="secondary">Olvido su contraseña?</v-btn>
+          <v-btn text small color="secondary">¿Olvidó su contraseña?</v-btn>
         </v-card-actions>
       </v-card>
     </v-container>
@@ -56,25 +55,32 @@ export default {
       valid: false,
     };
   },
+  setup() {
+    const employeeStore = useEmployeeStore();
+    return { employeeStore };
+  },
   methods: {
     async login() {
       const endpoint = `https://elitemedicalbajio.online/rh/login?usuario=${encodeURIComponent(this.username)}&password=${encodeURIComponent(this.password)}`;
-      const employeeStore = useEmployeeStore();
 
       try {
         const response = await axios.post(endpoint);
+        const employeeData = response.data;
 
-        if (response.data.role.nombre === "admin") {
+        // Store employee data in Pinia
+        this.employeeStore.setEmployee(employeeData);
+
+        // Redirect based on role
+        if (employeeData.role.nombre === 'admin') {
           this.$router.push('/hr-dashboard');
-        } else if (response.data.role.nombre === "user") {
-          employeeStore.setEmployee(response.data); // Save employee data in the store
+        } else if (employeeData.role.nombre === 'user') {
           this.$router.push('/employee-dashboard');
         } else {
-          alert('Invalid username or password.');
+          alert('Role Invalido');
         }
       } catch (error) {
         console.error('Login error:', error);
-        alert('An error occurred during login.');
+        alert('Usuario o contraseña inválidos.');
       }
     },
   },

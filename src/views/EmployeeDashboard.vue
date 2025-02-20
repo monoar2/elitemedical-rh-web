@@ -1,42 +1,48 @@
 <template>
   <v-container>
     <v-row>
+      <!-- header -->
       <v-col cols="12">
         <v-card>
           <v-card-title>
             Employee Dashboard
+            <v-btn color="red" @click="handleLogout">Logout</v-btn>
           </v-card-title>
           <v-card-subtitle>
             <v-row>
               <v-col>
-                <v-label>Name:</v-label> {{ employee.empleado.nombre }} {{ employee.empleado.apellidoPaterno }} {{ employee.empleado.apellidoMaterno }}
+                <v-label>Name:</v-label> {{ employeeStore.getEmployee?.empleado?.nombre }} {{ employeeStore.getEmployee?.empleado?.apellidoPaterno }} {{ employeeStore.getEmployee?.empleado?.apellidoMaterno }}
               </v-col>
               <v-col>
-                <v-label>Email:</v-label> {{ employee.empleado.correo }}
+                <v-label>Email:</v-label> {{ employeeStore.getEmployee?.empleado?.correo }}
               </v-col>
               <v-col>
-                <v-label>Phone:</v-label> {{ employee.empleado.telefono }}
+                <v-label>Phone:</v-label> {{ employeeStore.getEmployee?.empleado?.telefono }}
               </v-col>
             </v-row>
-            <v-row>
-              <v-col>
-                <v-label>Vacation Days Available:</v-label> {{ employee.empleado.vacacionesDisponibles }}
-              </v-col>
-              <v-col>
-                <v-label>Sick Days Available:</v-label> {{ employee.empleado.diasPorEnfermedadDisponibles }}
-              </v-col>
-            </v-row>
+
           </v-card-subtitle>
         </v-card>
       </v-col>
+      <!-- header -->
       <v-col cols="12">
         <v-form @submit.prevent="handleVacationRequest">
           <v-row>
             <v-col>
-              <v-date-picker v-model="startDate" label="Start Date" />
+              <v-date-picker
+                  v-model="startDate"
+                  label="Start Date"
+                  :year-range="[1900, 2100]"
+              />
+
             </v-col>
             <v-col>
-              <v-date-picker v-model="endDate" label="End Date" />
+              <v-date-picker
+                  v-model="endDate"
+                  label="Start Date"
+                  :year-range="[1900, 2100]"
+              />
+
             </v-col>
             <v-col>
               <v-select
@@ -54,6 +60,10 @@
           <v-alert v-if="feedbackMessage" :type="feedbackType" outlined>
             {{ feedbackMessage }}
           </v-alert>
+          <div v-else>
+            <p>Please log in to access the dashboard.</p>
+            <router-link to="/login">Go to Login</router-link>
+          </div>
         </v-form>
       </v-col>
       <v-col cols="12">
@@ -76,6 +86,10 @@ import { useEmployeeStore } from '@/store/employee';
 
 
 export default {
+  setup() {
+    const employeeStore = useEmployeeStore();
+    return { employeeStore };
+  },
   data() {
     const employeeStore = useEmployeeStore();
 
@@ -97,13 +111,17 @@ export default {
     };
   },
   methods: {
+    async handleLogout() {
+      this.employeeStore.logout();
+      this.$router.push('/login');
+    },
     async loadEmployee() {
       try {
-        const response = await axios.get(`https://elitemedicalbajio.online/rh/empleados/get/${employeeStore.employee.empleado.id}`);
+        const response = await axios.get(`https://elitemedicalbajio.online/rh/empleados/get/${this.employeeStore.getEmployee.empleado.id}`);
         this.employee = response.data;
       } catch (error) {
-        this.feedbackMessage = "Failed to load employee data.";
-        this.feedbackType = "error";
+        this.feedbackMessage = 'Failed to load employee data.';
+        this.feedbackType = 'error';
       }
     },
     async loadVacationTypes() {
@@ -153,7 +171,7 @@ export default {
         if (response.status === 201) {
           this.feedbackMessage = "Vacation request submitted successfully!";
           this.feedbackType = "success";
-          this.loadVacations();
+          await this.loadVacations();
         } else {
           this.feedbackMessage = "Failed to submit vacation request.";
           this.feedbackType = "error";
@@ -168,12 +186,11 @@ export default {
     },
   },
   async mounted() {
-    await this.loadEmployee();
-    await this.loadVacationTypes();
-    await this.loadVacations();
-
-    console.log('Vacation Types:', this.vacationTypes);
-
+    if (this.employeeStore.isLoggedIn) {
+      await this.loadEmployee();
+      await this.loadVacationTypes();
+      await this.loadVacations();
+    }
   },
   watch: {
     selectedVacationType(newVal) {
