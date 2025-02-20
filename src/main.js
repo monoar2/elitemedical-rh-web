@@ -5,9 +5,15 @@ import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import 'vuetify/styles'
-import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import { aliases, mdi } from 'vuetify/iconsets/mdi-svg'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faUserMinus, faRightFromBracket , faUser, faAddressCard, faPlaneDeparture, faHotel, faSyringe, faSackDollar, faSackXmark, faHouseLaptop} from '@fortawesome/free-solid-svg-icons'
+
 import { createPinia } from 'pinia';
 import {useEmployeeStore} from "@/store/employee.js";
+
+library.add(faUserMinus, faRightFromBracket, faUser, faAddressCard, faPlaneDeparture, faHotel, faSyringe, faSackDollar, faSackXmark, faHouseLaptop)
 
 // Theme configuration
 const theme = {
@@ -25,19 +31,6 @@ const theme = {
                 warning: '#FB8C00',
                 background: '#FFFFFF',
             }
-        },
-        dark: {
-            dark: true,
-            colors: {
-                primary: '#2196F3',
-                secondary: '#B0BEC5',
-                accent: '#FF4081',
-                error: '#FF5252',
-                info: '#2196F3',
-                success: '#4CAF50',
-                warning: '#FB8C00',
-                background: '#121212',
-            }
         }
     }
 };
@@ -45,6 +38,10 @@ const theme = {
 const vuetify = createVuetify({
     components,
     directives,
+    locale: {
+        locale: 'es', // Set Spanish as the default locale
+        fallback: 'en', // Fallback to English if needed
+    },
     icons: {
         defaultSet: 'mdi',
         aliases,
@@ -52,12 +49,12 @@ const vuetify = createVuetify({
             mdi,
         }
     },
-    theme, // Apply the custom theme
+    theme,
 });
 
 const pinia = createPinia();
 const app = createApp(App);
-
+app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(router);
 app.use(pinia);
 

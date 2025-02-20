@@ -2,13 +2,18 @@
   <v-app>
     <!-- Top Bar -->
     <v-app-bar app color="primary" dark>
-      <v-toolbar-title>TABLERO DE RH</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-avatar v-if="currentUser" size="36" class="mr-2">
-        <span>{{ currentUser.empleado?.nombre?.charAt(0) }}</span>
-      </v-avatar>
-      <v-btn text @click="logout">
-        <v-icon left>mdi-logout</v-icon> Cerrar Sesión
+      <img src="@/assets/Logo_NB.png" alt="EliteMedical Bajio Logo" width="150" />
+
+      <v-spacer>
+      </v-spacer>
+      <p class="subtitle-1">Bienvenido, {{ currentUser?.empleado?.nombre }}!</p>
+
+      <v-btn text @click="logout" hover="Cerrar sesion">
+        <font-awesome-icon :icon="['fas', 'right-from-bracket']" />
+        <v-tooltip
+            activator="parent"
+            location="bottom"
+        >Cerrar Sesion</v-tooltip>
       </v-btn>
     </v-app-bar>
 
@@ -16,7 +21,6 @@
       <v-row class="mb-5 justify-center">
         <v-col cols="12" class="text-center">
           <h1 class="display-1 primary--text">TABLERO DE RH</h1>
-          <p class="subtitle-1">Bienvenido, {{ currentUser?.empleado?.nombre }}!</p>
         </v-col>
       </v-row>
 
@@ -24,21 +28,23 @@
         <!-- Users Section -->
         <v-col cols="12" md="6" class="pa-4">
           <v-card class="elevation-10">
-            <v-card-title class="headline primary--text text-center">GESTIONAR USUARIOS</v-card-title>
+            <v-card-title class="headline primary--text text-center">
+              GESTIONAR USUARIOS
+              <font-awesome-icon :icon="['fas', 'user']" />
+            </v-card-title>
             <v-card-text>
               <v-btn color="primary" class="mb-6 elevation-2" @click="openCreateUserModal">
-                <v-icon left>mdi-plus</v-icon> Crear usuario
+                Crear usuario
               </v-btn>
               <v-list two-line>
                 <v-divider></v-divider>
                 <v-list-item v-for="user in users" :key="user.id" @click="editUser(user)">
-                  <v-list-item-content>
                     <v-list-item-title>{{ user.nombre }}</v-list-item-title>
                     <v-list-item-subtitle>{{ user.role.nombre }}</v-list-item-subtitle>
-                  </v-list-item-content>
                   <v-list-item-action>
-                    <v-btn icon @click.stop="deleteUser(user.id)">
-                      <v-icon color="red">mdi-delete</v-icon>
+                    <v-divider></v-divider>
+                    <v-btn icon color="red" @click.stop="deleteUser(user.id)">
+                      <font-awesome-icon :icon="['fas', 'user-minus']" />
                     </v-btn>
                   </v-list-item-action>
                   <v-divider></v-divider>
@@ -51,22 +57,24 @@
         <!-- Employees Section -->
         <v-col cols="12" md="6" class="pa-4">
           <v-card class="elevation-10">
-            <v-card-title class="headline primary--text text-center">GESTIONAR EMPLEADOS</v-card-title>
+            <v-card-title class="headline primary--text text-center">
+              GESTIONAR EMPLEADOS
+              <font-awesome-icon :icon="['fas', 'address-card']" />
+            </v-card-title>
             <v-card-text>
               <v-btn color="primary" class="mb-6 elevation-2" @click="createEmployee">
-                <v-icon left>mdi-account-plus</v-icon> Crear Empleado
+                Crear Empleado
               </v-btn>
               <v-list two-line>
                 <v-divider></v-divider>
                 <v-list-item v-for="employee in employees" :key="employee.id" @click="editEmployee(employee)">
-                  <v-list-item-content>
                     <v-list-item-title>{{ employee.nombre }} {{ employee.apellidoPaterno }} {{ employee.apellidoMaterno }}</v-list-item-title>
                     <v-list-item-subtitle>{{ employee.correo }}</v-list-item-subtitle>
                     <v-list-item-subtitle>{{ employee.telefono }}</v-list-item-subtitle>
-                  </v-list-item-content>
                   <v-list-item-action>
-                    <v-btn icon @click.stop="deleteEmployee(employee.id)">
-                      <v-icon color="red">mdi-delete</v-icon>
+                    <v-divider></v-divider>
+                    <v-btn icon color="red" @click.stop="deleteEmployee(employee.id) ">
+                      <font-awesome-icon :icon="['fas', 'user-minus']" />
                     </v-btn>
                   </v-list-item-action>
                   <v-divider></v-divider>
@@ -202,7 +210,10 @@
         <!-- Vacation Requests Section -->
         <v-col cols="12" class="pa-4">
           <v-card class="elevation-10">
-            <v-card-title class="headline primary--text text-center">SOLICITUDES DE VACACIONES</v-card-title>
+            <v-card-title class="headline primary--text text-center">
+              SOLICITUDES DE AUSENCIAS
+              <font-awesome-icon :icon="['fas', 'plane-departure']" />
+            </v-card-title>
             <v-card-text>
               <v-data-table
                   :headers="vacationHeaders"
@@ -243,8 +254,12 @@
                 </template>
                 <template v-slot:item.tipoVacacion="{ item }">
                   {{ item.tipoVacacion.descripcion }}
-                  <span v-if="item.tipoVacacion.conGoceDeSueldo">(Con Goce de Sueldo)</span>
-                  <span v-else>(Sin Goce de Sueldo)</span>
+                  <span v-if="item.tipoVacacion.conGoceDeSueldo">(Con Goce de Sueldo)
+                    <font-awesome-icon size="2x" :icon="['fas', 'sack-dollar']" />
+                  </span>
+                  <span v-else>(Sin Goce de Sueldo)
+                    <font-awesome-icon size="2x" :icon="['fas', 'sack-xmark']" />
+                  </span>
                 </template>
                 <template v-slot:item.estatus="{ item }">
                   {{ item.estauts || 'Pendiente' }}

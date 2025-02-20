@@ -1,89 +1,169 @@
 <template>
-  <v-container>
-    <v-row>
-      <!-- header -->
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>
-            Employee Dashboard
-            <v-btn color="red" @click="handleLogout">Logout</v-btn>
-          </v-card-title>
-          <v-card-subtitle>
-            <v-row>
-              <v-col>
-                <v-label>Name:</v-label> {{ employeeStore.getEmployee?.empleado?.nombre }} {{ employeeStore.getEmployee?.empleado?.apellidoPaterno }} {{ employeeStore.getEmployee?.empleado?.apellidoMaterno }}
-              </v-col>
-              <v-col>
-                <v-label>Email:</v-label> {{ employeeStore.getEmployee?.empleado?.correo }}
-              </v-col>
-              <v-col>
-                <v-label>Phone:</v-label> {{ employeeStore.getEmployee?.empleado?.telefono }}
-              </v-col>
-            </v-row>
+  <v-app>
+    <!-- Top Bar -->
+    <v-app-bar app color="primary" dark>
+      <img src="@/assets/Logo_NB.png" alt="EliteMedical Bajio Logo" width="150" />
 
-          </v-card-subtitle>
-        </v-card>
-      </v-col>
-      <!-- header -->
-      <v-col cols="12">
-        <v-form @submit.prevent="handleVacationRequest">
-          <v-row>
-            <v-col>
-              <v-date-picker
-                  v-model="startDate"
-                  label="Start Date"
-                  :year-range="[1900, 2100]"
-              />
+      <v-spacer></v-spacer>
+      <p class="subtitle-1">Bienvenido, {{ employeeStore.getEmployee?.empleado?.nombre }}!</p>
+      <v-btn text @click="handleLogout">
+        <font-awesome-icon :icon="['fas', 'right-from-bracket']" />
+        <v-tooltip
+            activator="parent"
+            location="bottom"
+        >Cerrar Sesion</v-tooltip>
+      </v-btn>
+    </v-app-bar>
 
-            </v-col>
-            <v-col>
-              <v-date-picker
-                  v-model="endDate"
-                  label="Start Date"
-                  :year-range="[1900, 2100]"
-              />
+    <!-- Main Content -->
+    <v-container fluid v-if="employeeStore.isLoggedIn">
+      <v-row class="mb-5 justify-center">
+        <v-col cols="12" class="text-center">
+          <h1 class="display-1 primary--text">TABLERO DE EMPLEADO</h1>
 
-            </v-col>
-            <v-col>
-              <v-select
-                  v-model="selectedVacationType"
-                  :items="vacationTypes"
-                  item-title="descripcion"
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <!-- Employee Info -->
+        <v-col cols="12">
+          <v-card class="elevation-10">
+            <v-card-title class="headline primary--text text-center">INFORMACIÓN DEL EMPLEADO
+              <font-awesome-icon :icon="['fas', 'address-card']" />
+            </v-card-title>
+            <v-card-subtitle>
+              <v-row>
+                <v-col>
+                  <v-label>Nombre:</v-label> {{ employeeStore.getEmployee?.empleado?.nombre }} {{ employeeStore.getEmployee?.empleado?.apellidoPaterno }} {{ employeeStore.getEmployee?.empleado?.apellidoMaterno }}
+                </v-col>
+                <v-col>
+                  <v-label>Email:</v-label> {{ employeeStore.getEmployee?.empleado?.correo }}
+                </v-col>
+                <v-col>
+                  <v-label>Teléfono:</v-label> {{ employeeStore.getEmployee?.empleado?.telefono }}
+                </v-col>
+                <v-col>
+                  <v-label>Vacaciones disponibles:</v-label> {{ employeeStore.getEmployee?.empleado?.vacacionesDisponibles }}
+                </v-col>
+                <v-col>
+                  <v-label>Dias por enfermedad:</v-label> {{ employeeStore.getEmployee?.empleado?.diasPorEnfermedadDisponibles }}
+                </v-col>
+              </v-row>
+            </v-card-subtitle>
+          </v-card>
+        </v-col>
+
+        <!-- Vacation Request Form -->
+        <v-col cols="12">
+          <v-card class="elevation-10">
+            <v-card-title class="headline primary--text text-center">SOLICITAR AUSENCIA
+              <font-awesome-icon :icon="['fas', 'house-laptop']" />
+            </v-card-title>
+            <v-card-text>
+              <v-form @submit.prevent="handleVacationRequest" ref="vacationForm" v-model="validForm">
+                <v-row>
+                  <v-col>
+                    <v-date-picker
+                        title="-----------------------------------------------"
+                        v-model="startDate"
+                        label="Fecha de Inicio"
+                        :year-range="[1900, 2100]"
+                        :rules="[v => !!v || 'Fecha de inicio es requerida']"
+                        border="lg"
+                        color="blue"
+                        header="Fecha inicio"
+
+                    />
+                  </v-col>
+                  <v-col>
+                    <v-date-picker
+                        title="-----------------------------------------------"
+                        v-model="endDate"
+                        label="Fecha de Fin"
+                        :year-range="[1900, 2100]"
+                        :rules="[v => !!v || 'Fecha de fin es requerida', v => (v && v >= startDate) || 'Fecha de fin debe ser posterior a la de inicio']"
+                        border="lg"
+                        color="blue"
+                        header="Fecha de Regreso"
+
+                    />
+                  </v-col>
+                  <v-col>
+                    <v-select
+                        v-model="selectedVacationType"
+                        :items="vacationTypes"
+                        item-title="descripcion"
+                        item-value="id"
+                        label="Tipo de Ausencia"
+                        :rules="[v => !!v || 'Tipo de Ausencia es requerido']"
+                    />
+                  </v-col>
+                  <v-col>
+                    <v-btn type="submit" color="primary" :disabled="!validForm">Enviar Solicitud</v-btn>
+                  </v-col>
+                </v-row>
+                <v-alert v-if="feedbackMessage" :type="feedbackType" outlined class="mt-4">
+                  {{ feedbackMessage }}
+                </v-alert>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- Vacation List -->
+        <v-col cols="12">
+          <v-card class="elevation-10">
+            <v-card-title class="headline primary--text text-center">
+              MIS SOLICITUDES DE AUSENCIAS
+              <font-awesome-icon :icon="['fas', 'plane-departure']" />
+            </v-card-title>
+            <v-card-text>
+              <v-data-table
+                  :headers="tableHeaders"
+                  :items="vacationList"
                   item-value="id"
-                  label="Vacation Type"
-              />
-            </v-col>
-            <v-col>
-              <v-btn type="submit" color="primary">Submit Request</v-btn>
-            </v-col>
-          </v-row>
-          <v-alert v-if="feedbackMessage" :type="feedbackType" outlined>
-            {{ feedbackMessage }}
-          </v-alert>
-          <div v-else>
-            <p>Please log in to access the dashboard.</p>
-            <router-link to="/login">Go to Login</router-link>
-          </div>
-        </v-form>
-      </v-col>
-      <v-col cols="12">
-        <v-data-table :items="vacationList" :headers="tableHeaders" item-value="id" class="elevation-1">
-          <template #item.fechaInicio="{ item }">
-            {{ formatDate(item.fechaInicio) }}
-          </template>
-          <template #item.fechaFin="{ item }">
-            {{ formatDate(item.fechaFin) }}
-          </template>
-        </v-data-table>
-      </v-col>
-    </v-row>
-  </v-container>
+                  class="elevation-1"
+                  dense
+              >
+                <template v-slot:header="{ props }">
+                  <thead>
+                  <tr>
+                    <th v-for="header in props.headers" :key="header.value" class="text-uppercase primary--text">
+                      {{ header.text }}
+                    </th>
+                  </tr>
+                  </thead>
+                </template>
+                <template v-slot:item.fechaInicio="{ item }">
+                  {{ formatDate(item.fechaInicio) }}
+                </template>
+                <template v-slot:item.fechaFin="{ item }">
+                  {{ formatDate(item.fechaFin) }}
+                </template>
+                <template v-slot:item.tipoVacacion.nombre="{ item }">
+                  {{ item.tipoVacacion.descripcion }}
+                </template>
+                <template v-slot:item.estatus="{ item }">
+                  {{ item.estauts || 'Pendiente' }}
+                </template>
+              </v-data-table>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <!-- Not Logged In Message -->
+    <v-container v-else class="text-center mt-10">
+      <p>Por favor, inicia sesión para acceder al tablero.</p>
+      <router-link to="/login">Ir al Login</router-link>
+    </v-container>
+  </v-app>
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 import { useEmployeeStore } from '@/store/employee';
-
 
 export default {
   setup() {
@@ -91,22 +171,22 @@ export default {
     return { employeeStore };
   },
   data() {
-    const employeeStore = useEmployeeStore();
-
     return {
-      employee: employeeStore.employee, // Reactive employee data
+      employee: null,
       vacationTypes: [],
       vacationList: [],
       startDate: null,
       endDate: null,
       selectedVacationType: null,
-      feedbackMessage: "",
-      feedbackType: "error",
+      feedbackMessage: '',
+      feedbackType: 'error',
+      validForm: false,
       tableHeaders: [
-        { text: "Start Date", value: "fechaInicio" },
-        { text: "End Date", value: "fechaFin" },
-        { text: "Type", value: "tipoVacacion.nombre" },
-        { text: "Status", value: "estatus" },
+        { text: 'id', value: 'id' },
+        { text: 'Fecha de Inicio', value: 'fechaInicio' },
+        { text: 'Fecha de Fin', value: 'fechaFin' },
+        { text: 'Tipo', value: 'tipoVacacion.nombre' },
+        { text: 'Estado', value: 'estatus' },
       ],
     };
   },
@@ -120,65 +200,59 @@ export default {
         const response = await axios.get(`https://elitemedicalbajio.online/rh/empleados/get/${this.employeeStore.getEmployee.empleado.id}`);
         this.employee = response.data;
       } catch (error) {
-        this.feedbackMessage = 'Failed to load employee data.';
+        this.feedbackMessage = 'Error al cargar datos del empleado.';
         this.feedbackType = 'error';
       }
     },
     async loadVacationTypes() {
       try {
-        const response = await axios.get("https://elitemedicalbajio.online/rh/tipo_vacacion/get");
+        const response = await axios.get('https://elitemedicalbajio.online/rh/tipo_vacacion/get');
         this.vacationTypes = response.data;
-        this.$set(this, 'vacationTypes', response.data);
-
       } catch (error) {
-        this.feedbackMessage = "Failed to load vacation types.";
-        this.feedbackType = "error";
+        this.feedbackMessage = 'Error al cargar tipos de vacaciones.';
+        this.feedbackType = 'error';
       }
     },
     async loadVacations() {
       try {
-        const response = await axios.get(
-            `https://elitemedicalbajio.online/rh/vacaciones/empleado/${this.employee.empleado.id}`
-        );
+        const response = await axios.get(`https://elitemedicalbajio.online/rh/vacaciones/empleado/${this.employeeStore.getEmployee.empleado.id}`);
         this.vacationList = response.data;
       } catch (error) {
-        this.feedbackMessage = "Failed to load vacations.";
-        this.feedbackType = "error";
+        this.feedbackMessage = 'Error al cargar solicitudes de vacaciones.';
+        this.feedbackType = 'error';
       }
     },
     async handleVacationRequest() {
-      if (!this.startDate || !this.endDate || !this.selectedVacationType) {
-        this.feedbackMessage = "Please fill out all fields.";
-        this.feedbackType = "error";
-        return;
-      }
-
-      if (this.endDate < this.startDate) {
-        this.feedbackMessage = "End date must be after start date.";
-        this.feedbackType = "error";
+      if (!this.$refs.vacationForm.validate()) {
+        this.feedbackMessage = 'Por favor, completa todos los campos correctamente.';
+        this.feedbackType = 'error';
         return;
       }
 
       try {
         const request = {
-          empleado: { id: this.employee.empleado.id },
+          empleado: { id: this.employeeStore.getEmployee.empleado.id },
           tipoVacacion: { id: this.selectedVacationType },
           fechaInicio: this.startDate,
           fechaFin: this.endDate,
         };
 
-        const response = await axios.post("https://elitemedicalbajio.online/rh/vacaciones/save", request);
+        const response = await axios.post('https://elitemedicalbajio.online/rh/vacaciones/save', request);
         if (response.status === 201) {
-          this.feedbackMessage = "Vacation request submitted successfully!";
-          this.feedbackType = "success";
+          this.feedbackMessage = 'Solicitud de vacaciones enviada exitosamente!';
+          this.feedbackType = 'success';
+          this.startDate = null;
+          this.endDate = null;
+          this.selectedVacationType = null;
+          this.$refs.vacationForm.reset();
           await this.loadVacations();
         } else {
-          this.feedbackMessage = "Failed to submit vacation request.";
-          this.feedbackType = "error";
+          this.feedbackMessage = 'Error al enviar la solicitud de vacaciones.';
+          this.feedbackType = 'error';
         }
       } catch (error) {
-        this.feedbackMessage = "Error while submitting vacation request.";
-        this.feedbackType = "error";
+        this.feedbackMessage = 'Error al procesar la solicitud de vacaciones.';
+        this.feedbackType = 'error';
       }
     },
     formatDate(date) {
@@ -192,14 +266,52 @@ export default {
       await this.loadVacations();
     }
   },
-  watch: {
-    selectedVacationType(newVal) {
-      console.log('Selected Vacation Type:', newVal);
-    }
-  }
 };
 </script>
 
 <style scoped>
-/* Add your styles here */
+.v-card {
+  border-radius: 8px;
+}
+
+.v-card-title {
+  background-color: #E3F2FD;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.v-btn--icon {
+  margin-left: 8px;
+}
+
+.v-data-table thead th {
+  background-color: #BBDEFB !important;
+  color: #000 !important;
+  font-weight: bold;
+}
+
+.v-data-table tbody tr:nth-child(even) {
+  background-color: #E3F2FD;
+}
+
+.v-btn--text {
+  text-transform: uppercase;
+}
+.v-date-picker-controls_month-btn{
+  color: blue;
+}
+.v-date-picker-header .v-btn {
+  background-color: #1976D2 !important; /* Primary blue color */
+  color: white !important;
+  border-radius: 4px;
+}
+.v-date-picker-header .v-btn:hover {
+  background-color: #1565C0 !important; /* Darker blue on hover */
+}
+
+.v-date-picker-controls .v-btn:first-child  {
+  background-color: #1976D2 !important; /* Primary blue color */
+  color: white !important;
+  border-radius: 4px;
+
+}
 </style>
