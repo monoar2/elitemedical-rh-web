@@ -21,5 +21,5 @@ export default defineConfig({
   server: {
     allowedHosts: ['elitemedicalbajio.online']
   },
-  base: '/',
+  base: '/rh-web/',
 })

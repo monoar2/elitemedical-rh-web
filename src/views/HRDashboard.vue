@@ -1,14 +1,22 @@
 <template>
   <v-app>
     <!-- Top Bar -->
-
+    <v-app-bar app color="primary" dark>
+      <v-toolbar-title>TABLERO DE RH</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-avatar v-if="currentUser" size="36" class="mr-2">
+        <span>{{ currentUser.empleado?.nombre?.charAt(0) }}</span>
+      </v-avatar>
+      <v-btn text @click="logout">
+        <v-icon left>mdi-logout</v-icon> Cerrar Sesión
+      </v-btn>
+    </v-app-bar>
 
     <v-container fluid>
       <v-row class="mb-5 justify-center">
         <v-col cols="12" class="text-center">
-
           <h1 class="display-1 primary--text">TABLERO DE RH</h1>
-          <p class="subtitle-1">Bienvenido, RH administrativo!</p>
+          <p class="subtitle-1">Bienvenido, {{ currentUser?.empleado?.nombre }}!</p>
         </v-col>
       </v-row>
 
@@ -23,11 +31,7 @@
               </v-btn>
               <v-list two-line>
                 <v-divider></v-divider>
-                <v-list-item
-                    v-for="user in users"
-                    :key="user.id"
-                    @click="editUser(user)"
-                >
+                <v-list-item v-for="user in users" :key="user.id" @click="editUser(user)">
                   <v-list-item-content>
                     <v-list-item-title>{{ user.nombre }}</v-list-item-title>
                     <v-list-item-subtitle>{{ user.role.nombre }}</v-list-item-subtitle>
@@ -54,14 +58,11 @@
               </v-btn>
               <v-list two-line>
                 <v-divider></v-divider>
-                <v-list-item
-                    v-for="employee in employees"
-                    :key="employee.id"
-                    @click="editEmployee(employee)"
-                >
+                <v-list-item v-for="employee in employees" :key="employee.id" @click="editEmployee(employee)">
                   <v-list-item-content>
                     <v-list-item-title>{{ employee.nombre }} {{ employee.apellidoPaterno }} {{ employee.apellidoMaterno }}</v-list-item-title>
                     <v-list-item-subtitle>{{ employee.correo }}</v-list-item-subtitle>
+                    <v-list-item-subtitle>{{ employee.telefono }}</v-list-item-subtitle>
                   </v-list-item-content>
                   <v-list-item-action>
                     <v-btn icon @click.stop="deleteEmployee(employee.id)">
@@ -81,121 +82,121 @@
         <v-card>
           <v-card-title class="headline primary--text">Editar Usuario</v-card-title>
           <v-card-text>
-            <v-form ref="editUserForm">
-              <v-text-field v-model="editingUser.nombre" label="Nombre" required></v-text-field>
-              <v-text-field v-model="editingUser.password" label="Contraseña" type="password" required></v-text-field>
+            <v-form ref="editUserForm" v-model="validEditUserForm">
+              <v-text-field v-model="editingUser.nombre" label="Nombre" required :rules="[v => !!v || 'Nombre es requerido']"></v-text-field>
+              <v-text-field v-model="editingUser.password" label="Contraseña" type="password" required :rules="[v => !!v || 'Contraseña es requerida']"></v-text-field>
               <v-select
                   v-model="editingUser.role"
                   :items="roles"
                   item-title="nombre"
-                  item-value="id"
+                  return-object
                   label="Rol del usuario"
                   required
+                  :rules="[v => !!v || 'Rol es requerido']"
               ></v-select>
               <v-select
                   v-model="editingUser.empleado"
                   :items="employees"
                   item-title="nombre"
-                  item-value="id"
+                  return-object
                   label="Empleado para asociar al usuario"
                   required
+                  :rules="[v => !!v || 'Empleado es requerido']"
               ></v-select>
             </v-form>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="blue darken-1" text @click="closeEditUserModal">Cerrar</v-btn>
-            <v-btn color="blue darken-1" text @click="saveUserChanges">Guardar</v-btn>
+            <v-btn color="blue darken-1" text @click="saveUserChanges" :disabled="!validEditUserForm">Guardar</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
 
-        <!-- Modal for Creating User -->
-        <v-dialog v-model="createUserModal" max-width="600px">
-          <v-card>
-            <v-card-title>
-              <span class="text-h5">Crear Usuario</span>
-            </v-card-title>
-            <v-card-text>
-              <v-form ref="createUserForm">
-                <v-text-field v-model="newUser.nombre" label="Nombre" required></v-text-field>
-                <v-text-field v-model="newUser.password" label="Contraseña" type="password" required></v-text-field>
-                <v-select
-                    v-model="newUser.role"
-                    :items="roles"
-                    item-title="nombre"
-                    item-value="id"
-                    label="Rol del usuario"
-                    required
-                ></v-select>
-                <v-select
-                    v-model="newUser.empleado"
-                    :items="employees"
-                    item-title="nombre"
-                    item-value="id"
-                    label="Empleado para asociar al usuario"
-                    required
-                ></v-select>
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeCreateUserModal">Cerrar</v-btn>
-              <v-btn color="blue darken-1" text @click="createUser">Guardar</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+      <v-dialog v-model="createUserModal" max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">Crear Usuario</span>
+          </v-card-title>
+          <v-card-text>
+            <v-form ref="createUserForm" v-model="validCreateUserForm">
+              <v-text-field v-model="newUser.nombre" label="Nombre" required :rules="[v => !!v || 'Nombre es requerido']"></v-text-field>
+              <v-text-field v-model="newUser.password" label="Contraseña" type="password" required :rules="[v => !!v || 'Contraseña es requerida']"></v-text-field>
+              <v-select
+                  v-model="newUser.role"
+                  :items="roles"
+                  item-title="nombre"
+                  return-object
+                  label="Rol del usuario"
+                  required
+                  :rules="[v => !!v || 'Rol es requerido']"
+              ></v-select>
+              <v-select
+                  v-model="newUser.empleado"
+                  :items="employees"
+                  item-title="nombre"
+                  return-object
+                  label="Empleado para asociar al usuario"
+                  required
+                  :rules="[v => !!v || 'Empleado es requerido']"
+              ></v-select>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeCreateUserModal">Cerrar</v-btn>
+            <v-btn color="blue darken-1" text @click="createUser" :disabled="!validCreateUserForm">Guardar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
-        <!-- Modal for Creating Employee -->
-        <v-dialog v-model="createEmployeeModal" max-width="600px">
-          <v-card>
-            <v-card-title>
-              <span class="text-h5">Crear Empleado</span>
-            </v-card-title>
-            <v-card-text>
-              <v-form ref="createEmployeeForm">
-                <v-text-field v-model="newEmployee.nombre" label="Nombre" required></v-text-field>
-                <v-text-field v-model="newEmployee.apellidoPaterno" label="Apellido Paterno" required></v-text-field>
-                <v-text-field v-model="newEmployee.apellidoMaterno" label="Apellido Materno" required></v-text-field>
-                <v-text-field v-model="newEmployee.correo" label="Correo" type="email" required></v-text-field>
-                <v-text-field v-model="newEmployee.telefono" label="Teléfono" required></v-text-field>
-                <v-text-field v-model="newEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required></v-text-field>
-                <v-text-field v-model="newEmployee.diasPorEnfermedadDisponibles" label="Días por Enfermedad Disponibles" type="number" required></v-text-field>
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeCreateEmployeeModal">Cerrar</v-btn>
-              <v-btn color="blue darken-1" text @click="saveNewEmployee">Guardar</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+      <v-dialog v-model="createEmployeeModal" max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">Crear Empleado</span>
+          </v-card-title>
+          <v-card-text>
+            <v-form ref="createEmployeeForm" v-model="validCreateEmployeeForm">
+              <v-text-field v-model="newEmployee.nombre" label="Nombre" required :rules="[v => !!v || 'Nombre es requerido']"></v-text-field>
+              <v-text-field v-model="newEmployee.apellidoPaterno" label="Apellido Paterno" required :rules="[v => !!v || 'Apellido Paterno es requerido']"></v-text-field>
+              <v-text-field v-model="newEmployee.apellidoMaterno" label="Apellido Materno" required :rules="[v => !!v || 'Apellido Materno es requerido']"></v-text-field>
+              <v-text-field v-model="newEmployee.correo" label="Correo" type="email" required :rules="[v => !!v || 'Correo es requerido', v => /.+@.+\..+/.test(v) || 'Correo debe ser válido']"></v-text-field>
+              <v-text-field v-model="newEmployee.telefono" label="Teléfono" required :rules="[v => !!v || 'Teléfono es requerido']"></v-text-field>
+              <v-text-field v-model="newEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+              <v-text-field v-model="newEmployee.diasPorEnfermedadDisponibles" label="Días por Enfermedad Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeCreateEmployeeModal">Cerrar</v-btn>
+            <v-btn color="blue darken-1" text @click="saveNewEmployee" :disabled="!validCreateEmployeeForm">Guardar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
-        <!-- Modal for Editing Employee -->
-        <v-dialog v-model="editEmployeeModal" max-width="600px">
-          <v-card>
-            <v-card-title>
-              <span class="text-h5">Editar Empleado</span>
-            </v-card-title>
-            <v-card-text>
-              <v-form ref="editEmployeeForm">
-                <v-text-field v-model="editingEmployee.nombre" label="Nombre" required></v-text-field>
-                <v-text-field v-model="editingEmployee.apellidoPaterno" label="Apellido Paterno" required></v-text-field>
-                <v-text-field v-model="editingEmployee.apellidoMaterno" label="Apellido Materno" required></v-text-field>
-                <v-text-field v-model="editingEmployee.correo" label="Correo" type="email" required></v-text-field>
-                <v-text-field v-model="editingEmployee.telefono" label="Teléfono" required></v-text-field>
-                <v-text-field v-model="editingEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required></v-text-field>
-                <v-text-field v-model="editingEmployee.diasPorEnfermedadDisponibles" label="Días por Enfermedad Disponibles" type="number" required></v-text-field>
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeEditEmployeeModal">Cerrar</v-btn>
-              <v-btn color="blue darken-1" text @click="saveEmployeeChanges">Guardar</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-
+      <v-dialog v-model="editEmployeeModal" max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">Editar Empleado</span>
+          </v-card-title>
+          <v-card-text>
+            <v-form ref="editEmployeeForm" v-model="validEditEmployeeForm">
+              <v-text-field v-model="editingEmployee.nombre" label="Nombre" required :rules="[v => !!v || 'Nombre es requerido']"></v-text-field>
+              <v-text-field v-model="editingEmployee.apellidoPaterno" label="Apellido Paterno" required :rules="[v => !!v || 'Apellido Paterno es requerido']"></v-text-field>
+              <v-text-field v-model="editingEmployee.apellidoMaterno" label="Apellido Materno" required :rules="[v => !!v || 'Apellido Materno es requerido']"></v-text-field>
+              <v-text-field v-model="editingEmployee.correo" label="Correo" type="email" required :rules="[v => !!v || 'Correo es requerido', v => /.+@.+\..+/.test(v) || 'Correo debe ser válido']"></v-text-field>
+              <v-text-field v-model="editingEmployee.telefono" label="Teléfono" required :rules="[v => !!v || 'Teléfono es requerido']"></v-text-field>
+              <v-text-field v-model="editingEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+              <v-text-field v-model="editingEmployee.diasPorEnfermedadDisponibles" label="Días por Enfermedad Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeEditEmployeeModal">Cerrar</v-btn>
+            <v-btn color="blue darken-1" text @click="saveEmployeeChanges" :disabled="!validEditEmployeeForm">Guardar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
       <v-row>
         <!-- Vacation Requests Section -->
@@ -256,12 +257,12 @@
 
       <v-dialog v-model="confirmDeleteDialog" max-width="290">
         <v-card>
-          <v-card-title class="headline">Confirm Delete</v-card-title>
-          <v-card-text>Are you sure you want to delete this {{ itemToDelete.type }}?</v-card-text>
+          <v-card-title class="headline">Confirmar Eliminación</v-card-title>
+          <v-card-text>¿Estás seguro de que deseas eliminar este {{ itemToDelete?.type === 'user' ? 'usuario' : 'empleado' }}?</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="dark" text @click="confirmDeleteDialog = false">Cancel</v-btn>
-            <v-btn color="red darken-1" text @click="confirmDelete">Delete</v-btn>
+            <v-btn color="dark" text @click="confirmDeleteDialog = false">Cancelar</v-btn>
+            <v-btn color="red darken-1" text @click="confirmDelete">Eliminar</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -270,54 +271,35 @@
 </template>
 
 <script>
-import axios from "axios";
-import { VDialog, VCard, VCardTitle, VCardText, VCardActions, VBtn, VAppBar, VToolbarTitle, VSpacer, VAvatar } from 'vuetify/components';import { useEmployeeStore } from '@/store/employee';
+import axios from 'axios';
+import { useEmployeeStore } from '@/store/employee';
 
 export default {
-  components: {
-    VDialog,
-    VCard,
-    VCardTitle,
-    VCardText,
-    VCardActions,
-    VBtn,
-    VAppBar,
-    VToolbarTitle,
-    VSpacer,
-    VAvatar
-  },
   data() {
     return {
-      users: [], // List of users
-      employees: [], // List of employees
-      vacationTypes: [], // List of vacation types
-      vacationRequests: [], // List of vacation requests
-      roles: [], // List of Roles
+      users: [],
+      employees: [],
+      vacationTypes: [],
+      vacationRequests: [],
+      roles: [],
       vacationHeaders: [
-        { text: "Employee", value: "empleado" },
-        { text: "Start Date", value: "fechaInicio" },
-        { text: "End Date", value: "fechaFin" },
-        { text: "Type", value: "tipoVacacion" },
-        { text: "Status", value: "estatus" },
-        { text: "Actions", value: "actions", sortable: false },
+        { text: 'Empleado', value: 'empleado' },
+        { text: 'Fecha Inicio', value: 'fechaInicio' },
+        { text: 'Fecha Fin', value: 'fechaFin' },
+        { text: 'Tipo', value: 'tipoVacacion' },
+        { text: 'Estado', value: 'estatus' },
+        { text: 'Acciones', value: 'actions', sortable: false },
       ],
       editUserModal: false,
-      editingUser: {
-        id: null,
-        nombre: '',
-        password: '',
-        role: '',
-        empleado: '',
-      },
+      validEditUserForm: false,
+      editingUser: { id: null, nombre: '', password: '', role: null, empleado: null },
       createUserModal: false,
-      newUser: {
-        nombre: '',
-        password: '',
-        role: '',
-        empleado: ''
-      },
+      validCreateUserForm: false,
+      newUser: { nombre: '', password: '', role: null, empleado: null },
       createEmployeeModal: false,
+      validCreateEmployeeForm: false,
       editEmployeeModal: false,
+      validEditEmployeeForm: false,
       newEmployee: {
         nombre: '',
         apellidoPaterno: '',
@@ -325,7 +307,7 @@ export default {
         correo: '',
         telefono: '',
         vacacionesDisponibles: 0,
-        diasPorEnfermedadDisponibles: 0
+        diasPorEnfermedadDisponibles: 0,
       },
       editingEmployee: {
         id: null,
@@ -335,40 +317,36 @@ export default {
         correo: '',
         telefono: '',
         vacacionesDisponibles: 0,
-        diasPorEnfermedadDisponibles: 0
+        diasPorEnfermedadDisponibles: 0,
       },
       confirmDeleteDialog: false,
-      itemToDelete: null
+      itemToDelete: null,
     };
   },
   computed: {
     currentUser() {
       const employeeStore = useEmployeeStore();
-      return employeeStore.employee;
-    }
-  },
-  watch: {
-    vacationHeaders(newVal) {
-      console.log('Headers changed:', newVal);
-    }
+      return employeeStore.getEmployee;
+    },
   },
   methods: {
     // Fetch Roles
     async fetchRoles() {
       try {
-        const response = await axios.get("https://elitemedicalbajio.online/rh/roles/get");
+        const response = await axios.get('https://elitemedicalbajio.online/rh/roles/get');
         this.roles = response.data;
       } catch (error) {
-        console.error("Error fetching roles:", error);
+        console.error('Error fetching roles:', error);
       }
     },
+
     // Users Management
     async fetchUsers() {
       try {
-        const response = await axios.get("https://elitemedicalbajio.online/rh/usuarios/get");
+        const response = await axios.get('https://elitemedicalbajio.online/rh/usuarios/get');
         this.users = response.data;
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       }
     },
     openCreateUserModal() {
@@ -377,72 +355,63 @@ export default {
     closeCreateUserModal() {
       this.createUserModal = false;
       this.$refs.createUserForm.reset();
-      this.newUser = { nombre: '', password: '', role: '' , empleado: '' };
+      this.newUser = { nombre: '', password: '', role: null, empleado: null };
     },
-    createUser() {
-      // Validate form
+    async createUser() {
       if (this.$refs.createUserForm.validate()) {
         const newUserDTO = {
           nombre: this.newUser.nombre,
           password: this.newUser.password,
-          role: { id: this.newUser.role },
-          empleado: { id: this.newUser.empleado }
+          role: { id: this.newUser.role.id },
+          empleado: { id: this.newUser.empleado.id },
         };
-
-        axios.post('https://elitemedicalbajio.online/rh/usuarios/save', newUserDTO)
-            .then(response => {
-              console.log('User saved:', response.data);
-              this.fetchUsers();
-              this.closeCreateUserModal();
-              alert("User saved successfully!");
-            })
-            .catch(error => {
-              console.error('Error saving user:', error);
-              alert("Failed to save user!");
-            });
+        try {
+          await axios.post('https://elitemedicalbajio.online/rh/usuarios/save', newUserDTO);
+          this.fetchUsers();
+          this.closeCreateUserModal();
+          alert('Usuario creado exitosamente!');
+        } catch (error) {
+          console.error('Error saving user:', error);
+          alert('Error al crear usuario!');
+        }
       }
     },
     editUser(user) {
-      // Copy user data to editingUser object for editing
-      this.editingUser = { ...user };
-      this.editUserModal = true; // Open the modal
+      this.editingUser = { ...user, role: user.role, empleado: user.empleado };
+      this.editUserModal = true;
     },
     closeEditUserModal() {
       this.editUserModal = false;
       this.$refs.editUserForm.reset();
     },
-    saveUserChanges() {
-      // Validate form
+    async saveUserChanges() {
       if (this.$refs.editUserForm.validate()) {
         const usuarioDTO = {
           id: this.editingUser.id,
           nombre: this.editingUser.nombre,
           password: this.editingUser.password,
-          role: this.editingUser.role,
-          empleado: this.editingUser.empleado
+          role: { id: this.editingUser.role.id },
+          empleado: { id: this.editingUser.empleado.id },
         };
-
-        axios.post("https://elitemedicalbajio.online/rh/usuarios/update", usuarioDTO)
-            .then(response => {
-              console.log('User updated successfully:', response.data);
-              this.fetchUsers();
-              this.closeEditUserModal();
-              alert("User updated successfully!");
-            })
-            .catch(error => {
-              console.error('Error updating user:', error);
-              alert("Failed to update user!");
-            });
+        try {
+          await axios.post('https://elitemedicalbajio.online/rh/usuarios/update', usuarioDTO);
+          this.fetchUsers();
+          this.closeEditUserModal();
+          alert('Usuario actualizado exitosamente!');
+        } catch (error) {
+          console.error('Error updating user:', error);
+          alert('Error al actualizar usuario!');
+        }
       }
     },
 
     // Employees Management
     async fetchEmployees() {
       try {
-        const response = await axios.get("https://elitemedicalbajio.online/rh/empleados/get");
+        const response = await axios.get('https://elitemedicalbajio.online/rh/empleados/get');
         this.employees = response.data;
       } catch (error) {
-        console.error("Error fetching employees:", error);
+        console.error('Error fetching employees:', error);
       }
     },
     createEmployee() {
@@ -451,21 +420,27 @@ export default {
     closeCreateEmployeeModal() {
       this.createEmployeeModal = false;
       this.$refs.createEmployeeForm.reset();
-      this.newEmployee = { nombre: '', correo: '' };
+      this.newEmployee = {
+        nombre: '',
+        apellidoPaterno: '',
+        apellidoMaterno: '',
+        correo: '',
+        telefono: '',
+        vacacionesDisponibles: 0,
+        diasPorEnfermedadDisponibles: 0,
+      };
     },
-    saveNewEmployee() {
+    async saveNewEmployee() {
       if (this.$refs.createEmployeeForm.validate()) {
-        axios.post('https://elitemedicalbajio.online/rh/empleados/save', this.newEmployee)
-            .then(response => {
-              console.log('Employee saved:', response.data);
-              this.fetchEmployees(); // Refresh employee list
-              this.closeCreateEmployeeModal();
-              alert("Employee saved successfully!");
-            })
-            .catch(error => {
-              console.error('Error saving employee:', error);
-              alert("Failed to save employee!");
-            });
+        try {
+          await axios.post('https://elitemedicalbajio.online/rh/empleados/save', this.newEmployee);
+          this.fetchEmployees();
+          this.closeCreateEmployeeModal();
+          alert('Empleado creado exitosamente!');
+        } catch (error) {
+          console.error('Error saving employee:', error);
+          alert('Error al crear empleado!');
+        }
       }
     },
     editEmployee(employee) {
@@ -476,19 +451,17 @@ export default {
       this.editEmployeeModal = false;
       this.$refs.editEmployeeForm.reset();
     },
-    saveEmployeeChanges() {
+    async saveEmployeeChanges() {
       if (this.$refs.editEmployeeForm.validate()) {
-        axios.post('https://elitemedicalbajio.online/rh/empleados/update', this.editingEmployee)
-            .then(response => {
-              console.log('Employee updated:', response.data);
-              this.fetchEmployees(); // Refresh employee list
-              this.closeEditEmployeeModal();
-              alert("Employee updated successfully!");
-            })
-            .catch(error => {
-              console.error('Error updating employee:', error);
-              alert("Failed to update employee!");
-            });
+        try {
+          await axios.post('https://elitemedicalbajio.online/rh/empleados/update', this.editingEmployee);
+          this.fetchEmployees();
+          this.closeEditEmployeeModal();
+          alert('Empleado actualizado exitosamente!');
+        } catch (error) {
+          console.error('Error updating employee:', error);
+          alert('Error al actualizar empleado!');
+        }
       }
     },
     deleteUser(userId) {
@@ -499,27 +472,20 @@ export default {
       this.itemToDelete = { type: 'employee', id: employeeId };
       this.confirmDeleteDialog = true;
     },
-    confirmDelete() {
-      if (this.itemToDelete.type === 'user') {
-        axios.delete(`https://elitemedicalbajio.online/rh/usuarios/delete/${this.itemToDelete.id}`)
-            .then(() => {
-              this.fetchUsers(); // Refresh the users list
-              alert("User deleted successfully!");
-            })
-            .catch(() => {
-              console.error('Error deleting user');
-              alert("Failed to delete user!");
-            });
-      } else if (this.itemToDelete.type === 'employee') {
-        axios.delete(`https://elitemedicalbajio.online/rh/empleados/delete/${this.itemToDelete.id}`)
-            .then(() => {
-              this.fetchEmployees(); // Refresh the employees list
-              alert("Employee deleted successfully!");
-            })
-            .catch(() => {
-              console.error('Error deleting employee');
-              alert("Failed to delete employee!");
-            });
+    async confirmDelete() {
+      try {
+        if (this.itemToDelete.type === 'user') {
+          await axios.delete(`https://elitemedicalbajio.online/rh/usuarios/delete/${this.itemToDelete.id}`);
+          this.fetchUsers();
+          alert('Usuario eliminado exitosamente!');
+        } else if (this.itemToDelete.type === 'employee') {
+          await axios.delete(`https://elitemedicalbajio.online/rh/empleados/delete/${this.itemToDelete.id}`);
+          this.fetchEmployees();
+          alert('Empleado eliminado exitosamente!');
+        }
+      } catch (error) {
+        console.error(`Error deleting ${this.itemToDelete.type}:`, error);
+        alert(`Error al eliminar ${this.itemToDelete.type === 'user' ? 'usuario' : 'empleado'}!`);
       }
       this.confirmDeleteDialog = false;
     },
@@ -527,38 +493,36 @@ export default {
     // Vacation Requests Management
     async fetchVacationRequests() {
       try {
-        const response = await axios.get("https://elitemedicalbajio.online/rh/vacaciones/get");
+        const response = await axios.get('https://elitemedicalbajio.online/rh/vacaciones/get');
         this.vacationRequests = response.data;
       } catch (error) {
-        console.error("Error fetching vacation requests:", error);
+        console.error('Error fetching vacation requests:', error);
       }
     },
     approveRequest(request) {
-      // Update the status to approve
-      request.estauts = "APROBADA"; // Correct enum value for approved
+      request.estatus = 'APROBADA';
       this.updateVacationStatus(request);
     },
     rejectRequest(request) {
-      // Update the status to reject
-      request.estauts = "RECHAZADA"; // Correct enum value for rejected
+      request.estatus = 'RECHAZADA';
       this.updateVacationStatus(request);
     },
-    updateVacationStatus(request) {
-      axios.post("https://elitemedicalbajio.online/rh/vacaciones/update", request)
-          .then(response => {
-            console.log('Vacation request updated:', response.data);
-            this.fetchVacationRequests(); // Refresh the list
-            alert("Vacation request updated successfully!");
-          })
-          .catch(error => {
-            console.error('Error updating vacation request:', error);
-            alert("Failed to update vacation request!");
-          });
+    async updateVacationStatus(request) {
+      try {
+        await axios.post('https://elitemedicalbajio.online/rh/vacaciones/update', request);
+        this.fetchVacationRequests();
+        alert('Solicitud de vacaciones actualizada exitosamente!');
+      } catch (error) {
+        console.error('Error updating vacation request:', error);
+        alert('Error al actualizar solicitud de vacaciones!');
+      }
     },
+
+    // Logout
     logout() {
       const employeeStore = useEmployeeStore();
-      employeeStore.clearEmployee(); // Clear user data from the store
-      this.$router.push('/login'); // Redirect to login page after logout
+      employeeStore.logout(); // Use the logout method from the store
+      this.$router.push('/login');
     },
   },
   created() {
@@ -566,7 +530,6 @@ export default {
     this.fetchEmployees();
     this.fetchVacationRequests();
     this.fetchRoles();
-    console.log('Headers:', this.vacationHeaders);
   },
 };
 </script>
