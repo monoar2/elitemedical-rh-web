@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import vuetify from 'vite-plugin-vuetify';
+import {nodePolyfills} from "vite-plugin-node-polyfills";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -11,6 +12,9 @@ export default defineConfig({
     vueDevTools(),
     vuetify({
       autoImport: true, // Automatically imports Vuetify components
+    }),
+    nodePolyfills({
+      global: true, // Polyfill the `global` object
     }),
   ],
   resolve: {

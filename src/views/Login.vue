@@ -67,16 +67,14 @@ export default {
         const response = await axios.post(endpoint);
         const employeeData = response.data;
 
-        // Store employee data in Pinia
         this.employeeStore.setEmployee(employeeData);
 
-        // Redirect based on role
         if (employeeData.role.nombre === 'admin') {
           this.$router.push('/hr-dashboard');
         } else if (employeeData.role.nombre === 'user') {
           this.$router.push('/employee-dashboard');
         } else {
-          alert('Role Invalido');
+          alert('Rol Inválido');
         }
       } catch (error) {
         console.error('Login error:', error);
@@ -88,7 +86,6 @@ export default {
 </script>
 
 <style>
-/* Center the card and create an eye-catching background */
 .v-card {
   background-color: white;
   border-radius: 15px;

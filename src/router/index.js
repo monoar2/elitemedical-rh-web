@@ -1,14 +1,10 @@
-// src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
-import Login from '@/views/Login.vue';
-import EmployeeDashboard from "@/views/EmployeeDashboard.vue";
-import HRDashboard from "@/views/HRDashboard.vue";
-import {useEmployeeStore} from "@/store/employee.js";
+import { useEmployeeStore } from "@/store/employee.js";
 
 const routes = [
     {
         path: '/',
-        redirect: '/login', // Default route
+        redirect: '/login',
     },
     {
         path: '/login',
@@ -30,21 +26,18 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory('/rh-web/'), // Set the base URL here
+    history: createWebHistory('/rh-web/'),
     routes,
 });
 
 router.beforeEach((to, from, next) => {
     const employeeStore = useEmployeeStore();
 
-    if (to.meta.requiresAuth && !employeeStore.isLoggedIn) {
-        // Redirect to log in if not authenticated
+    if (to.meta.requiresAuth && !employeeStore.isAuthenticated) {
         next({ name: 'Login' });
     } else if (to.meta.requiresAdmin && !employeeStore.isAdmin) {
-        // Redirect to employee dashboard if not admin
         next({ name: 'EmployeeDashboard' });
     } else if (to.meta.requiresUser && employeeStore.isAdmin) {
-        // Redirect to HR dashboard if admin tries to access user-only route
         next({ name: 'HRDashboard' });
     } else {
         next();

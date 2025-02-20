@@ -1,21 +1,20 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import router from './router'; // Import the router
+import router from './router';
 import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
-import 'vuetify/styles'
-import { aliases, mdi } from 'vuetify/iconsets/mdi-svg'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faUserMinus, faRightFromBracket , faUser, faAddressCard, faPlaneDeparture, faHotel, faSyringe, faSackDollar, faSackXmark, faHouseLaptop} from '@fortawesome/free-solid-svg-icons'
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
+import 'vuetify/styles';
+import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faUserMinus, faRightFromBracket, faUser, faAddressCard, faPlaneDeparture, faHotel, faSyringe, faSackDollar, faSackXmark, faHouseLaptop } from '@fortawesome/free-solid-svg-icons';
 
 import { createPinia } from 'pinia';
-import {useEmployeeStore} from "@/store/employee.js";
+import { useEmployeeStore } from "@/store/employee.js";
 
-library.add(faUserMinus, faRightFromBracket, faUser, faAddressCard, faPlaneDeparture, faHotel, faSyringe, faSackDollar, faSackXmark, faHouseLaptop)
+library.add(faUserMinus, faRightFromBracket, faUser, faAddressCard, faPlaneDeparture, faHotel, faSyringe, faSackDollar, faSackXmark, faHouseLaptop);
 
-// Theme configuration
 const theme = {
     defaultTheme: 'light',
     themes: {
@@ -39,8 +38,8 @@ const vuetify = createVuetify({
     components,
     directives,
     locale: {
-        locale: 'es', // Set Spanish as the default locale
-        fallback: 'en', // Fallback to English if needed
+        locale: 'es',
+        fallback: 'en',
     },
     icons: {
         defaultSet: 'mdi',
@@ -54,7 +53,7 @@ const vuetify = createVuetify({
 
 const pinia = createPinia();
 const app = createApp(App);
-app.component('font-awesome-icon', FontAwesomeIcon)
+app.component('font-awesome-icon', FontAwesomeIcon);
 app.use(router);
 app.use(pinia);
 

@@ -1,34 +1,55 @@
-// src/store/employee.js
 import { defineStore } from 'pinia';
+import { connectWebSocket, disconnectWebSocket, onNotification } from '@/services/websocket';
 
 export const useEmployeeStore = defineStore('employee', {
     state: () => ({
-        employee: null,        // Employee data from login response
-        isAuthenticated: false // Tracks login state
+        employee: null,
+        isAuthenticated: false,
+        notifications: [],
     }),
     actions: {
-        // Set employee data after login
         setEmployee(employeeData) {
             this.employee = employeeData;
             this.isAuthenticated = true;
-            // Persist to localStorage
             localStorage.setItem('employee', JSON.stringify(employeeData));
+            if (employeeData?.empleado?.id) { // Adjusted to nested empleado.id
+                connectWebSocket(employeeData.empleado.id.toString());
+                onNotification((message) => {
+                    this.notifications.push({ content: message, timestamp: new Date() });
+                    setTimeout(() => {
+                        this.notifications.shift();
+                    }, 5000);
+                });
+            }
         },
 
-        // Load session from localStorage on app start
         loadSession() {
             const storedEmployee = localStorage.getItem('employee');
             if (storedEmployee) {
                 this.employee = JSON.parse(storedEmployee);
                 this.isAuthenticated = true;
+                if (this.employee?.empleado?.id) {
+                    connectWebSocket(this.employee.empleado.id.toString());
+                    onNotification((message) => {
+                        this.notifications.push({ content: message, timestamp: new Date() });
+                        setTimeout(() => {
+                            this.notifications.shift();
+                        }, 5000);
+                    });
+                }
             }
         },
 
-        // Logout action
         logout() {
             this.employee = null;
             this.isAuthenticated = false;
+            this.notifications = [];
             localStorage.removeItem('employee');
+            disconnectWebSocket();
+        },
+
+        clearNotification(index) {
+            this.notifications.splice(index, 1);
         },
     },
     getters: {
