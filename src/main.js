@@ -19,11 +19,11 @@ const theme = {
     defaultTheme: 'light',
     themes: {
         light: {
-            dark: false,
+            dark: true,
             colors: {
-                primary: '#1976D2',
+                primary: '#1a75b6',
                 secondary: '#424242',
-                accent: '#82B1FF',
+                accent: '#4a7fd9',
                 error: '#FF5252',
                 info: '#2196F3',
                 success: '#4CAF50',

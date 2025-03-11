@@ -12,37 +12,43 @@
 
     <v-main>
       <v-container fluid>
-        <v-row class="mb-5 justify-center">
-          <v-col cols="12" class="text-center">
-            <h1 class="display-1 primary--text">TABLERO DE RH</h1>
-          </v-col>
-        </v-row>
-
         <v-row>
           <v-col cols="12" md="6" class="pa-4">
             <v-card class="elevation-10">
+              <v-card-text>
               <v-card-title class="headline primary--text text-center">
                 GESTIONAR USUARIOS
                 <font-awesome-icon :icon="['fas', 'user']" />
               </v-card-title>
-              <v-card-text>
+           
                 <v-btn color="primary" class="mb-6 elevation-2" @click="openCreateUserModal">
                   Crear usuario
                 </v-btn>
-                <v-list two-line>
-                  <v-divider></v-divider>
-                  <v-list-item v-for="user in users" :key="user.id" @click="editUser(user)">
-                    <v-list-item-title>{{ user.nombre }}</v-list-item-title>
-                    <v-list-item-subtitle>{{ user.role.nombre }}</v-list-item-subtitle>
-                    <v-list-item-action>
-                      <v-btn icon color="red" @click.stop="deleteUser(user.id)">
-                        <font-awesome-icon :icon="['fas', 'user-minus']" />
-                      </v-btn>
-                    </v-list-item-action>
-                    <v-divider></v-divider>
-                  </v-list-item>
-                </v-list>
-              </v-card-text>
+             
+              <v-text-field
+                v-model="searchUsuarios"
+                append-icon="search"
+                label="Buscar Usuarios"
+                  single-line
+                  hide-details
+              ></v-text-field>
+              <v-data-table
+                :headers="userHeaders"
+                :items="users"
+                item-value="id"
+                class="elevation-1"
+                dense
+                height="400px"
+                @click:row="editUser"
+                :search="searchUsuarios"
+              >
+                <template v-slot:item.actions="{ item }">
+                  <v-btn icon color="red" @click.stop="deleteUser(item.id)">
+                    <font-awesome-icon :icon="['fas', 'user-minus']" />
+                  </v-btn>
+                </template>
+              </v-data-table>
+            </v-card-text>
             </v-card>
           </v-col>
 
@@ -56,20 +62,29 @@
                 <v-btn color="primary" class="mb-6 elevation-2" @click="createEmployee">
                   Crear Empleado
                 </v-btn>
-                <v-list two-line>
-                  <v-divider></v-divider>
-                  <v-list-item v-for="employee in employees" :key="employee.id" @click="editEmployee(employee)">
-                    <v-list-item-title>{{ employee.nombre }} {{ employee.apellidoPaterno }} {{ employee.apellidoMaterno }}</v-list-item-title>
-                    <v-list-item-subtitle>{{ employee.correo }}</v-list-item-subtitle>
-                    <v-list-item-subtitle>{{ employee.telefono }}</v-list-item-subtitle>
-                    <v-list-item-action>
-                      <v-btn icon color="red" @click.stop="deleteEmployee(employee.id)">
-                        <font-awesome-icon :icon="['fas', 'user-minus']" />
-                      </v-btn>
-                    </v-list-item-action>
-                    <v-divider></v-divider>
-                  </v-list-item>
-                </v-list>
+                <v-text-field
+                  v-model="searchEmpleados"
+                  append-icon="search"
+                  label="Buscar Empleados"
+                  single-line
+                  hide-details
+                ></v-text-field>
+                <v-data-table       
+                  :search="searchEmpleados"
+                  :headers="employeeHeaders"
+                  :items="employees"
+                  item-value="id"
+                  class="elevation-1"
+                  height="400px"
+                  dense
+                  @click:row="editEmployee"
+                >
+                  <template v-slot:item.actions="{ item }">
+                    <v-btn icon color="red" @click.stop="deleteEmployee(item.id)">
+                      <font-awesome-icon :icon="['fas', 'user-minus']" />
+                    </v-btn>
+                  </template>
+                </v-data-table>
               </v-card-text>
             </v-card>
           </v-col>
@@ -208,6 +223,7 @@
                     :items="vacationRequests"
                     item-value="id"
                     class="elevation-1"
+                    height="800px"
                     dense
                 >
                   <template v-slot:header="{ props }">
@@ -295,14 +311,6 @@ export default {
       vacationTypes: [],
       vacationRequests: [],
       roles: [],
-      vacationHeaders: [
-        { text: 'Empleado', value: 'empleado' },
-        { text: 'Fecha Inicio', value: 'fechaInicio' },
-        { text: 'Fecha Fin', value: 'fechaFin' },
-        { text: 'Tipo', value: 'tipoVacacion' },
-        { text: 'Estado', value: 'estatus' },
-        { text: 'Acciones', value: 'actions', sortable: false },
-      ],
       editUserModal: false,
       validEditUserForm: false,
       editingUser: { id: null, nombre: '', password: '', role: null, empleado: null },
@@ -334,6 +342,35 @@ export default {
       },
       confirmDeleteDialog: false,
       itemToDelete: null,
+      userHeaders: [
+        { title: 'Nombre', key: 'nombre' },
+        { title: 'Rol', key: 'role.nombre' },
+        { title: 'Acciones', key: 'actions', sortable: false },
+      ],
+      employeeHeaders: [
+        { title: 'Nombre', key: 'nombre'},
+        { title: 'Apellido Paterno', key: 'apellidoPaterno' },
+        { title: 'Apellido Materno', key: 'apellidoMaterno'},
+        { title: 'Correo', key: 'correo' },
+        { title: 'Teléfono', key: 'telefono' },
+        { title: 'Vacaciones Disponibles', key: 'vacacionesDisponibles' },
+        { title: 'Días por Enfermedad Disponibles', key: 'diasPorEnfermedadDisponibles' },
+        { title: 'Fecha de ingreso', key: 'fechaIngreso' },
+        { title: 'Fecha de baja', key: 'fechaBaja' },
+        { title: 'Usuario', key: 'usuario.nombre' },
+        { title: 'Acciones', key: 'actions', sortable: false },
+      ],
+      vacationHeaders: [
+        { title: 'Empleado', key: 'empleado' },
+        { title: 'Fecha Inicio', key: 'fechaInicio' },
+        { title: 'Fecha Fin', key: 'fechaFin' },
+        { title: 'Tipo', key: 'tipoVacacion' },
+        { title: 'Estado', key: 'estatus' },
+        { title: 'Acciones', key: 'actions', sortable: false },
+      ],
+      searchUsuarios: '',
+      searchEmpleados: '',
+      searchVacaciones: '',
     };
   },
   computed: {
@@ -550,34 +587,5 @@ export default {
 </script>
 
 <style>
-.v-card {
-  border-radius: 8px;
-}
 
-.v-card-title {
-  background-color: #E3F2FD;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.v-btn--icon {
-  margin-left: 8px;
-}
-
-.v-list-item {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.v-data-table thead th {
-  background-color: #BBDEFB !important;
-  color: #000 !important;
-  font-weight: bold;
-}
-
-.v-data-table tbody tr:nth-child(even) {
-  background-color: #E3F2FD;
-}
-
-.v-btn--text {
-  text-transform: uppercase;
-}
 </style>

@@ -3,7 +3,7 @@
     <v-container class="d-flex justify-center align-center" style="height: 100vh; background: linear-gradient(45deg, #2196f3, #4caf50);">
       <v-card elevation="10" max-width="400" class="rounded-3 shadow-lg">
         <div class="text-center py-4">
-          <img src="@/assets/Logo_Degradados.png" alt="EliteMedical Bajio Logo" width="150" />
+          <img src="@/assets/Logo_NB.png" alt="EliteMedical Bajio Logo" width="250" />
         </div>
         <v-card-title class="text-h6 text-center py-4">
           Tablero de gestión de empleados
@@ -86,11 +86,7 @@ export default {
 </script>
 
 <style>
-.v-card {
-  background-color: white;
-  border-radius: 15px;
-  overflow: hidden;
-}
+
 
 .v-btn {
   border-radius: 8px;

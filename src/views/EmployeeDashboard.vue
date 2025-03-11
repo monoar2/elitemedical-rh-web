@@ -10,18 +10,14 @@
       </v-btn>
     </v-app-bar>
 
-    <v-main>
-      <v-container fluid v-if="employeeStore.isLoggedIn">
-        <v-row class="mb-5 justify-center">
-          <v-col cols="12" class="text-center">
-            <h1 class="display-1 primary--text">TABLERO DE EMPLEADO</h1>
-          </v-col>
-        </v-row>
+    <v-main >
+      <v-container fluid v-if="employeeStore.isLoggedIn" > 
+
 
         <v-row>
           <v-col cols="12">
             <v-card class="elevation-10">
-              <v-card-title class="headline primary--text text-center">INFORMACIÓN DEL EMPLEADO
+              <v-card-title class="primary--text text-center">INFORMACIÓN DEL EMPLEADO
                 <font-awesome-icon :icon="['fas', 'address-card']" />
               </v-card-title>
               <v-card-subtitle>
@@ -55,23 +51,36 @@
                 <v-form @submit.prevent="handleVacationRequest" ref="vacationForm" v-model="validForm">
                   <v-row>
                     <v-col>
+                      <Text class="headerline primary--text text-center" text="Fecha de Inicio" >
+                        Fecha de Inicio
+                      </Text>  
                       <v-date-picker
                           v-model="startDate"
                           label="Fecha de Inicio"
                           :rules="[v => !!v || 'Fecha de inicio es requerida']"
                           color="blue"
-                          header="Fecha inicio"
+                          hide-header="true"
                       />
                     </v-col>
                     <v-col>
+                      <Text class="headerline primary--text text-center" text="Fecha de Regreso" >
+                        Fecha de Regreso
+                      </Text>  
                       <v-date-picker
                           v-model="endDate"
                           label="Fecha de Fin"
                           :rules="[v => !!v || 'Fecha de fin es requerida', v => (v && v >= startDate) || 'Fecha de fin debe ser posterior a la de inicio']"
                           color="blue"
-                          header="Fecha de Regreso"
+                          hide-header="true"
                       />
                     </v-col>
+                    
+                    
+                  </v-row>
+                  <v-row>
+                    TIPO DE AUSENCIA
+                  </v-row>  
+                  <v-row>
                     <v-col>
                       <v-select
                           v-model="selectedVacationType"
@@ -83,9 +92,9 @@
                       />
                     </v-col>
                     <v-col>
-                      <v-btn type="submit" color="primary" :disabled="!validForm">Enviar Solicitud</v-btn>
+                      <v-btn type="submit" color="primary" :disabled="!validForm">Enviar</v-btn>
                     </v-col>
-                  </v-row>
+                  </v-row>  
                   <v-alert v-if="feedbackMessage" :type="feedbackType" outlined class="mt-4">
                     {{ feedbackMessage }}
                   </v-alert>
@@ -100,6 +109,7 @@
                 MIS SOLICITUDES DE AUSENCIAS
                 <font-awesome-icon :icon="['fas', 'plane-departure']" />
               </v-card-title>
+              <divider></divider>
               <v-card-text>
                 <v-data-table
                     :headers="tableHeaders"
@@ -108,27 +118,6 @@
                     class="elevation-1"
                     dense
                 >
-                  <template v-slot:header="{ props }">
-                    <thead>
-                    <tr>
-                      <th v-for="header in props.headers" :key="header.value" class="text-uppercase primary--text">
-                        {{ header.text }}
-                      </th>
-                    </tr>
-                    </thead>
-                  </template>
-                  <template v-slot:item.fechaInicio="{ item }">
-                    {{ formatDate(item.fechaInicio) }}
-                  </template>
-                  <template v-slot:item.fechaFin="{ item }">
-                    {{ formatDate(item.fechaFin) }}
-                  </template>
-                  <template v-slot:item.tipoVacacion.nombre="{ item }">
-                    {{ item.tipoVacacion.descripcion }}
-                  </template>
-                  <template v-slot:item.estatus="{ item }">
-                    {{ item.estatus || 'Pendiente' }}
-                  </template>
                 </v-data-table>
               </v-card-text>
             </v-card>
@@ -149,6 +138,7 @@
 import axios from 'axios';
 import { useEmployeeStore } from '@/store/employee';
 import Notification from '@/components/Notification.vue';
+import { Text } from 'vue';
 
 export default {
   components: { Notification },
@@ -168,11 +158,10 @@ export default {
       feedbackType: 'error',
       validForm: false,
       tableHeaders: [
-        { text: 'ID', value: 'id' },
-        { text: 'Fecha de Inicio', value: 'fechaInicio' },
-        { text: 'Fecha de Fin', value: 'fechaFin' },
-        { text: 'Tipo', value: 'tipoVacacion.nombre' },
-        { text: 'Estado', value: 'estatus' },
+        { title: 'Fecha de Inicio', key: 'fechaInicio' },
+        { title: 'Fecha de Fin', key: 'fechaFin' },
+        { title: 'Tipo', key: 'tipoVacacion.descripcion' },
+        { title: 'Estado', key: 'estatus' },
       ],
     };
   },
@@ -261,7 +250,7 @@ export default {
 }
 
 .v-card-title {
-  background-color: #E3F2FD;
+  background-color: #1a75b6;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 
@@ -297,5 +286,15 @@ export default {
   background-color: #1976D2 !important;
   color: white !important;
   border-radius: 4px;
+}
+.headerline {
+  font-size: large;
+  color: #9cbcd3;
+  border-bottom: 2px solid #1976D2;
+  padding-bottom: 5px;
+}
+
+.with-divider {
+  border-right: 1px solid grey;
 }
 </style>
