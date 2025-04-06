@@ -25,10 +25,16 @@
                 outlined
                 dense
                 color="primary"
-                type="password"
+                :type="showPassword ? 'text' : 'password'"
                 class="mb-4"
                 required
-            ></v-text-field>
+                @keydown.enter="login"
+            >
+              <template #append>
+                <font-awesome-icon v-if="showPassword" :icon="['fas', 'eye-slash']" @mousedown="showPassword = true" @mouseup="showPassword = false" />
+                <font-awesome-icon v-else :icon="['fas', 'eye']" @mousedown="showPassword = true" @mouseup="showPassword = false" />
+              </template>
+            </v-text-field>
             <v-btn :disabled="!valid" block color="primary" class="py-3 text-body-2 font-weight-bold" @click="login">
               Log In
             </v-btn>
@@ -46,13 +52,16 @@
 <script>
 import axios from 'axios';
 import { useEmployeeStore } from '@/store/employee';
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 export default {
+  components: {FontAwesomeIcon},
   data() {
     return {
       username: '',
       password: '',
       valid: false,
+      showPassword: false,
     };
   },
   setup() {

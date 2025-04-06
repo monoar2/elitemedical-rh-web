@@ -8,18 +8,53 @@ import 'vuetify/styles';
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faUserMinus, faRightFromBracket, faUser, faAddressCard, faPlaneDeparture, faHotel, faSyringe, faSackDollar, faSackXmark, faHouseLaptop } from '@fortawesome/free-solid-svg-icons';
-
+import {
+    faUserMinus,
+    faRightFromBracket,
+    faUser,
+    faAddressCard,
+    faPlaneDeparture,
+    faHotel,
+    faSyringe,
+    faSackDollar,
+    faSackXmark,
+    faHouseLaptop,
+    faEye,
+    faEyeSlash,
+    faCalendar,
+    faCalendarDay,
+    faCalendarWeek,
+    faCalendarCheck,
+    faCalendarAlt
+} from '@fortawesome/free-solid-svg-icons';
 import { createPinia } from 'pinia';
 import { useEmployeeStore } from "@/store/employee.js";
 
-library.add(faUserMinus, faRightFromBracket, faUser, faAddressCard, faPlaneDeparture, faHotel, faSyringe, faSackDollar, faSackXmark, faHouseLaptop);
+library.add(
+    faUserMinus,
+    faRightFromBracket,
+    faUser,
+    faAddressCard,
+    faPlaneDeparture,
+    faHotel,
+    faSyringe,
+    faSackDollar,
+    faSackXmark,
+    faHouseLaptop,
+    faEye,
+    faEyeSlash,
+    faCalendar,
+    faCalendarDay,
+    faCalendarWeek,
+    faCalendarCheck,
+    faCalendarAlt
+);
 
 const theme = {
-    defaultTheme: 'light',
+    defaultTheme: 'dark',
     themes: {
         light: {
-            dark: true,
+            dark: false, // Changed to false since this is a light theme
             colors: {
                 primary: '#1a75b6',
                 secondary: '#424242',
@@ -37,28 +72,37 @@ const theme = {
 const vuetify = createVuetify({
     components,
     directives,
+    theme,
+    icons: {
+        defaultSet: 'mdi', // Keep MDI as default
+        aliases,
+        sets: {
+            mdi,
+            // Add Font Awesome as an additional icon set
+            fa: {
+                component: FontAwesomeIcon,
+            }
+        }
+    },
     locale: {
         locale: 'es',
         fallback: 'en',
     },
-    icons: {
-        defaultSet: 'mdi',
-        aliases,
-        sets: {
-            mdi,
-        }
-    },
-    theme,
 });
 
 const pinia = createPinia();
 const app = createApp(App);
+
+// Register FontAwesomeIcon globally
 app.component('font-awesome-icon', FontAwesomeIcon);
+
+// Use plugins
 app.use(router);
 app.use(pinia);
+app.use(vuetify);
 
+// Initialize employee store
 const employeeStore = useEmployeeStore();
 employeeStore.loadSession();
 
-app.use(vuetify);
 app.mount('#app');

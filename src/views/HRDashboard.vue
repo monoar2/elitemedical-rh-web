@@ -39,7 +39,7 @@
                 class="elevation-1"
                 dense
                 height="400px"
-                @click:row="editUser"
+                @click:row="editUser($data.users.at(id))"
                 :search="searchUsuarios"
               >
                 <template v-slot:item.actions="{ item }">
@@ -77,7 +77,7 @@
                   class="elevation-1"
                   height="400px"
                   dense
-                  @click:row="editEmployee"
+                  @click:row="editEmployee($data.employees.at(id))"
                 >
                   <template v-slot:item.actions="{ item }">
                     <v-btn icon color="red" @click.stop="deleteEmployee(item.id)">
@@ -176,6 +176,60 @@
                 <v-text-field v-model="newEmployee.telefono" label="Teléfono" required :rules="[v => !!v || 'Teléfono es requerido']"></v-text-field>
                 <v-text-field v-model="newEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
                 <v-text-field v-model="newEmployee.diasPorEnfermedadDisponibles" label="Días por Enfermedad Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+                <!-- First Date Picker (fechaDeAlta) -->
+                <v-menu
+                    v-model="datePickerMenu"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-text-field
+                        v-model="newEmployee.fechaDeAlta"
+                        label="Fecha de alta"
+                        readonly
+                        v-bind="props"
+                        required
+                        :rules="[v => !!v || 'Fecha de alta es requerida']"
+                    >
+                      <template v-slot:prepend>
+                        <font-awesome-icon :icon="['fas', 'calendar-alt']" />
+                      </template>
+                    </v-text-field>
+                  </template>
+                  <v-date-picker
+                      v-model="newEmployee.fechaDeAlta"
+                      @input="datePickerMenu = false"
+                  ></v-date-picker>
+                </v-menu>
+                <!-- Second Date Picker (fechaDeBaja) -->
+                <v-menu
+                    v-model="datePickerMenu2"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-text-field
+                        v-model="newEmployee.fechaDeBaja"
+                        label="Fecha de baja"
+                        readonly
+                        v-bind="props"
+                    >
+                      <template v-slot:prepend>
+                        <font-awesome-icon :icon="['fas', 'calendar-alt']" />
+                      </template>
+                    </v-text-field>
+                  </template>
+                  <v-date-picker
+                      v-model="newEmployee.fechaDeBaja"
+                      @input="datePickerMenu2 = false"
+                  ></v-date-picker>
+                </v-menu>
               </v-form>
             </v-card-text>
             <v-card-actions>
@@ -193,19 +247,118 @@
             </v-card-title>
             <v-card-text>
               <v-form ref="editEmployeeForm" v-model="validEditEmployeeForm">
-                <v-text-field v-model="editingEmployee.nombre" label="Nombre" required :rules="[v => !!v || 'Nombre es requerido']"></v-text-field>
-                <v-text-field v-model="editingEmployee.apellidoPaterno" label="Apellido Paterno" required :rules="[v => !!v || 'Apellido Paterno es requerido']"></v-text-field>
-                <v-text-field v-model="editingEmployee.apellidoMaterno" label="Apellido Materno" required :rules="[v => !!v || 'Apellido Materno es requerido']"></v-text-field>
-                <v-text-field v-model="editingEmployee.correo" label="Correo" type="email" required :rules="[v => !!v || 'Correo es requerido', v => /.+@.+\..+/.test(v) || 'Correo debe ser válido']"></v-text-field>
-                <v-text-field v-model="editingEmployee.telefono" label="Teléfono" required :rules="[v => !!v || 'Teléfono es requerido']"></v-text-field>
-                <v-text-field v-model="editingEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
-                <v-text-field v-model="editingEmployee.diasPorEnfermedadDisponibles" label="Días por Enfermedad Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+                <v-text-field
+                    v-model="editingEmployee.nombre"
+                    label="Nombre"
+                    required
+                    :rules="[v => !!v || 'Nombre es requerido']"
+                ></v-text-field>
+                <v-text-field
+                    v-model="editingEmployee.apellidoPaterno"
+                    label="Apellido Paterno"
+                    required
+                    :rules="[v => !!v || 'Apellido Paterno es requerido']"
+                ></v-text-field>
+                <v-text-field
+                    v-model="editingEmployee.apellidoMaterno"
+                    label="Apellido Materno"
+                    required
+                    :rules="[v => !!v || 'Apellido Materno es requerido']"
+                ></v-text-field>
+                <v-text-field
+                    v-model="editingEmployee.correo"
+                    label="Correo"
+                    type="email"
+                    required
+                    :rules="[v => !!v || 'Correo es requerido', v => /.+@.+\..+/.test(v) || 'Correo debe ser válido']"
+                ></v-text-field>
+                <v-text-field
+                    v-model="editingEmployee.telefono"
+                    label="Teléfono"
+                    required
+                    :rules="[v => !!v || 'Teléfono es requerido']"
+                ></v-text-field>
+                <v-text-field
+                    v-model="editingEmployee.vacacionesDisponibles"
+                    label="Vacaciones Disponibles"
+                    type="number"
+                    required
+                    :rules="[v => v >= 0 || 'Debe ser un número positivo']"
+                ></v-text-field>
+                <v-text-field
+                    v-model="editingEmployee.diasPorEnfermedadDisponibles"
+                    label="Días por Enfermedad Disponibles"
+                    type="number"
+                    required
+                    :rules="[v => v >= 0 || 'Debe ser un número positivo']"
+                ></v-text-field>
+
+                <!-- Added Date Picker for Fecha de Alta -->
+                <v-menu
+                    v-model="editDatePickerMenu"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-text-field
+                        v-model="editingEmployee.fechaDeAlta"
+                        label="Fecha de alta"
+                        readonly
+                        v-bind="props"
+                        required
+                        :rules="[v => !!v || 'Fecha de alta es requerida']"
+                    >
+                      <template v-slot:prepend>
+                        <font-awesome-icon :icon="['fas', 'calendar-alt']" />
+                      </template>
+                    </v-text-field>
+                  </template>
+                  <v-date-picker
+                      v-model="editingEmployee.fechaDeAlta"
+                      @input="editDatePickerMenu = false"
+                  ></v-date-picker>
+                </v-menu>
+
+                <!-- Added Date Picker for Fecha de Baja -->
+                <v-menu
+                    v-model="editDatePickerMenu2"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-text-field
+                        v-model="editingEmployee.fechaDeBaja"
+                        label="Fecha de baja"
+                        readonly
+                        v-bind="props"
+                    >
+                      <template v-slot:prepend>
+                        <font-awesome-icon :icon="['fas', 'calendar-alt']" />
+                      </template>
+                    </v-text-field>
+                  </template>
+                  <v-date-picker
+                      v-model="editingEmployee.fechaDeBaja"
+                      @input="editDatePickerMenu2 = false"
+                  ></v-date-picker>
+                </v-menu>
               </v-form>
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeEditEmployeeModal">Cerrar</v-btn>
-              <v-btn color="blue darken-1" text @click="saveEmployeeChanges" :disabled="!validEditEmployeeForm">Guardar</v-btn>
+              <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="saveEmployeeChanges"
+                  :disabled="!validEditEmployeeForm"
+              >Guardar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -223,7 +376,7 @@
                     :items="vacationRequests"
                     item-value="id"
                     class="elevation-1"
-                    height="800px"
+                    height="550px"
                     dense
                 >
                   <template v-slot:header="{ props }">
@@ -267,12 +420,6 @@
                   </template>
                   <template v-slot:item.estatus="{ item }">
                     {{ item.estatus || 'Pendiente' }}
-                  </template>
-                  <template v-slot:item.fechaInicio="{ item }">
-                    {{ formatDate(item.fechaInicio) }}
-                  </template>
-                  <template v-slot:item.fechaFin="{ item }">
-                    {{ formatDate(item.fechaFin) }}
                   </template>
                 </v-data-table>
               </v-card-text>
@@ -355,15 +502,15 @@ export default {
         { title: 'Teléfono', key: 'telefono' },
         { title: 'Vacaciones Disponibles', key: 'vacacionesDisponibles' },
         { title: 'Días por Enfermedad Disponibles', key: 'diasPorEnfermedadDisponibles' },
-        { title: 'Fecha de ingreso', key: 'fechaIngreso' },
-        { title: 'Fecha de baja', key: 'fechaBaja' },
+        { title: 'Fecha de ingreso', key: 'fechaDeAlta' },
+        { title: 'Fecha de baja', key: 'fechaDeBaja' },
         { title: 'Usuario', key: 'usuario.nombre' },
         { title: 'Acciones', key: 'actions', sortable: false },
       ],
       vacationHeaders: [
         { title: 'Empleado', key: 'empleado' },
-        { title: 'Fecha Inicio', key: 'fechaInicio' },
-        { title: 'Fecha Fin', key: 'fechaFin' },
+        { title: 'Fecha Inicio', key: 'fechaInicio'},
+        { title: 'Fecha Fin', key: 'fechaFin'},
         { title: 'Tipo', key: 'tipoVacacion' },
         { title: 'Estado', key: 'estatus' },
         { title: 'Acciones', key: 'actions', sortable: false },
@@ -371,6 +518,8 @@ export default {
       searchUsuarios: '',
       searchEmpleados: '',
       searchVacaciones: '',
+      datePickerMenu: false,
+      datePickerMenu2: false,
     };
   },
   computed: {
@@ -478,6 +627,8 @@ export default {
         telefono: '',
         vacacionesDisponibles: 0,
         diasPorEnfermedadDisponibles: 0,
+        fechaDeAlta: null,
+        fechaDeBaja: null,
       };
     },
     async saveNewEmployee() {
@@ -493,8 +644,8 @@ export default {
         }
       }
     },
-    editEmployee(employee) {
-      this.editingEmployee = { ...employee };
+    editEmployee(item) {
+      this.editingEmployee = { ...item };
       this.editEmployeeModal = true;
     },
     closeEditEmployeeModal() {
