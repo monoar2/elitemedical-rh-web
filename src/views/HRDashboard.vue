@@ -39,7 +39,7 @@
                 class="elevation-1"
                 dense
                 height="400px"
-                @click:row="editUser($data.users.at(id))"
+                @click:row="editUser"
                 :search="searchUsuarios"
               >
                 <template v-slot:item.actions="{ item }">
@@ -77,7 +77,7 @@
                   class="elevation-1"
                   height="400px"
                   dense
-                  @click:row="editEmployee($data.employees.at(id))"
+                  @click:row="editEmployee"
                 >
                   <template v-slot:item.actions="{ item }">
                     <v-btn icon color="red" @click.stop="deleteEmployee(item.id)">
@@ -532,6 +532,9 @@ export default {
     return { employeeStore };
   },
   methods: {
+    handleClick(event, row) {
+      console.log("Clicked item: ", row.item)
+    },
     async fetchRoles() {
       try {
         const response = await axios.get('https://elitemedicalbajio.online/rh/roles/get');
@@ -576,8 +579,8 @@ export default {
         }
       }
     },
-    editUser(user) {
-      this.editingUser = { ...user, role: user.role, empleado: user.empleado };
+    editUser(event, row) {
+      this.editingUser = { ...row.item, role: row.item.role, empleado: row.item.empleado };
       this.editUserModal = true;
     },
     closeEditUserModal() {
@@ -589,9 +592,9 @@ export default {
         const usuarioDTO = {
           id: this.editingUser.id,
           nombre: this.editingUser.nombre,
+          role:   this.editingUser.role,
           password: this.editingUser.password,
-          role: { id: this.editingUser.role.id },
-          empleado: { id: this.editingUser.empleado.id },
+          empleadoId: this.editingUser.empleado.id ,
         };
         try {
           await axios.post('https://elitemedicalbajio.online/rh/usuarios/update', usuarioDTO);
@@ -644,8 +647,8 @@ export default {
         }
       }
     },
-    editEmployee(item) {
-      this.editingEmployee = { ...item };
+    editEmployee(event, row) {
+      this.editingEmployee = { ...row.item };
       this.editEmployeeModal = true;
     },
     closeEditEmployeeModal() {
