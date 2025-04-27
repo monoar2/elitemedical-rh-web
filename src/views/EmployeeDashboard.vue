@@ -35,7 +35,7 @@
                     <v-label>Vacaciones disponibles:</v-label> {{ employeeStore.getEmployee?.empleado?.vacacionesDisponibles }}
                   </v-col>
                   <v-col>
-                    <v-label>Días por enfermedad:</v-label> {{ employeeStore.getEmployee?.empleado?.diasPorEnfermedadDisponibles }}
+                    <v-label>Ausencia Justificada:</v-label> {{ employeeStore.getEmployee?.empleado?.diasPorEnfermedadDisponibles }}
                   </v-col>
                 </v-row>
               </v-card-subtitle>
@@ -221,6 +221,7 @@ export default {
           this.selectedVacationType = null;
           this.$refs.vacationForm.reset();
           await this.loadVacations();
+          await this.employeeStore.fetchEmployeeDetails();
         } else {
           this.feedbackMessage = 'Error al enviar la solicitud de vacaciones.';
           this.feedbackType = 'error';

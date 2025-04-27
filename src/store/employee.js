@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { connectWebSocket, disconnectWebSocket, onNotification } from '@/services/websocket';
+import axios from 'axios'; // Import axios if not already imported
 
 export const useEmployeeStore = defineStore('employee', {
     state: () => ({
@@ -12,7 +13,7 @@ export const useEmployeeStore = defineStore('employee', {
             this.employee = employeeData;
             this.isAuthenticated = true;
             localStorage.setItem('employee', JSON.stringify(employeeData));
-            if (employeeData?.empleado?.id) { // Adjusted to nested empleado.id
+            if (employeeData?.empleado?.id) {
                 connectWebSocket(employeeData.empleado.id.toString());
                 onNotification((message) => {
                     this.notifications.push({ content: message, timestamp: new Date() });
@@ -50,6 +51,18 @@ export const useEmployeeStore = defineStore('employee', {
 
         clearNotification(index) {
             this.notifications.splice(index, 1);
+        },
+
+        async fetchEmployeeDetails() {
+            try {
+                if (this.employee?.empleado?.id) {
+                    const response = await axios.get(`https://elitemedicalbajio.online/rh/empleados/get/${this.employee.empleado.id}`); // Use your actual API endpoint
+                    this.employee = response.data; // Update the entire employee state
+                }
+            } catch (error) {
+                console.error('Error fetching employee details:', error);
+                // Handle error appropriately
+            }
         },
     },
     getters: {

@@ -175,7 +175,7 @@
                 <v-text-field v-model="newEmployee.correo" label="Correo" type="email" required :rules="[v => !!v || 'Correo es requerido', v => /.+@.+\..+/.test(v) || 'Correo debe ser válido']"></v-text-field>
                 <v-text-field v-model="newEmployee.telefono" label="Teléfono" required :rules="[v => !!v || 'Teléfono es requerido']"></v-text-field>
                 <v-text-field v-model="newEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
-                <v-text-field v-model="newEmployee.diasPorEnfermedadDisponibles" label="Días por Enfermedad Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+                <v-text-field v-model="newEmployee.diasPorEnfermedadDisponibles" label="Ausencias Justificadas" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
                 <!-- First Date Picker (fechaDeAlta) -->
                 <v-menu
                     v-model="datePickerMenu"
@@ -287,7 +287,7 @@
                 ></v-text-field>
                 <v-text-field
                     v-model="editingEmployee.diasPorEnfermedadDisponibles"
-                    label="Días por Enfermedad Disponibles"
+                    label="Ausencias Justificadas Disponibles"
                     type="number"
                     required
                     :rules="[v => v >= 0 || 'Debe ser un número positivo']"
@@ -501,7 +501,7 @@ export default {
         { title: 'Correo', key: 'correo' },
         { title: 'Teléfono', key: 'telefono' },
         { title: 'Vacaciones Disponibles', key: 'vacacionesDisponibles' },
-        { title: 'Días por Enfermedad Disponibles', key: 'diasPorEnfermedadDisponibles' },
+        { title: 'Ausencias Justificadas Disponibles', key: 'diasPorEnfermedadDisponibles' },
         { title: 'Fecha de ingreso', key: 'fechaDeAlta' },
         { title: 'Fecha de baja', key: 'fechaDeBaja' },
         { title: 'Usuario', key: 'usuario.nombre' },
@@ -552,14 +552,17 @@ export default {
         console.error('Error fetching users:', error);
       }
     },
+
     openCreateUserModal() {
       this.createUserModal = true;
     },
+
     closeCreateUserModal() {
       this.createUserModal = false;
       this.$refs.createUserForm.reset();
       this.newUser = { nombre: '', password: '', role: null, empleado: null };
     },
+
     async createUser() {
       if (this.$refs.createUserForm.validate()) {
         const newUserDTO = {
@@ -579,6 +582,7 @@ export default {
         }
       }
     },
+
     editUser(event, row) {
       this.editingUser = { ...row.item, role: row.item.role, empleado: row.item.empleado };
       this.editUserModal = true;
@@ -705,17 +709,20 @@ export default {
     async approveRequest(request) {
       try {
         await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/approve/${request.id}?empleadoId=${request.empleado.id}`);
-        this.fetchVacationRequests();
+        await this.fetchVacationRequests();
+        await this.employeeStore.fetchEmployeeDetails(); // Keep this line
         alert('Solicitud de vacaciones aprobada exitosamente!');
       } catch (error) {
         console.error('Error approving vacation request:', error);
         alert('Error al aprobar solicitud de vacaciones!');
       }
     },
+
     async rejectRequest(request) {
       try {
         await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/reject/${request.id}?empleadoId=${request.empleado.id}`);
-        this.fetchVacationRequests();
+        await this.fetchVacationRequests();
+        await this.employeeStore.fetchEmployeeDetails(); // Keep this line
         alert('Solicitud de vacaciones rechazada exitosamente!');
       } catch (error) {
         console.error('Error rejecting vacation request:', error);
