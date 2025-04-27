@@ -391,6 +391,21 @@
                   <template v-slot:item.empleado="{ item }">
                     {{ item.empleado.nombre }} {{ item.empleado.apellidoPaterno }} {{ item.empleado.apellidoMaterno }}
                   </template>
+                  <template v-slot:item.tipoVacacion="{ item }">
+                    {{ item.tipoVacacion.descripcion }}
+                    <span v-if="item.tipoVacacion.conGoceDeSueldo">(Con Goce de Sueldo)
+                      <font-awesome-icon size="2x" :icon="['fas', 'sack-dollar']" />
+                    </span>
+                    <span v-else>(Sin Goce de Sueldo)
+                      <font-awesome-icon size="2x" :icon="['fas', 'sack-xmark']" />
+                    </span>
+                  </template>
+                  <template v-slot:item.estatus="{ item }">
+                    {{ item.estatus || 'Pendiente' }}
+                  </template>
+                  <template v-slot:item.comentarios="{ item }">
+                    {{ item.comentarios }}
+                  </template>
                   <template v-slot:item.actions="{ item }">
                     <v-btn
                         color="green"
@@ -408,24 +423,46 @@
                     >
                       RECHAZAR
                     </v-btn>
-                  </template>
-                  <template v-slot:item.tipoVacacion="{ item }">
-                    {{ item.tipoVacacion.descripcion }}
-                    <span v-if="item.tipoVacacion.conGoceDeSueldo">(Con Goce de Sueldo)
-                      <font-awesome-icon size="2x" :icon="['fas', 'sack-dollar']" />
-                    </span>
-                    <span v-else>(Sin Goce de Sueldo)
-                      <font-awesome-icon size="2x" :icon="['fas', 'sack-xmark']" />
-                    </span>
-                  </template>
-                  <template v-slot:item.estatus="{ item }">
-                    {{ item.estatus || 'Pendiente' }}
+                    <v-btn
+                        icon
+                        color="blue"
+                        @click="openCommentDialog(item)"
+                    >
+                      <font-awesome-icon :icon="['fas', 'comment']" />
+                      <v-tooltip activator="parent" location="bottom">Añadir Comentario</v-tooltip>
+                    </v-btn>
+                    <v-btn
+                        color="orange"
+                        text
+                        :disabled="item.estatus !== 'APROBADA'"
+                        @click="revokeRequest(item)"
+                    >
+                      REVOCAR
+                    </v-btn>
                   </template>
                 </v-data-table>
               </v-card-text>
             </v-card>
           </v-col>
         </v-row>
+
+        <v-dialog v-model="commentDialog" max-width="500px">
+          <v-card>
+            <v-card-title class="headline">Añadir Comentario</v-card-title>
+            <v-card-text>
+              <v-textarea
+                  v-model="newComment"
+                  label="Comentario"
+                  outlined
+              ></v-textarea>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="grey" text @click="closeCommentDialog">Cancelar</v-btn>
+              <v-btn color="primary" text @click="saveComment">Guardar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
 
         <v-dialog v-model="confirmDeleteDialog" max-width="290">
           <v-card>
@@ -476,6 +513,8 @@ export default {
         telefono: '',
         vacacionesDisponibles: 0,
         diasPorEnfermedadDisponibles: 0,
+        fechaDeAlta: null,
+        fechaDeBaja: null,
       },
       editingEmployee: {
         id: null,
@@ -486,6 +525,8 @@ export default {
         telefono: '',
         vacacionesDisponibles: 0,
         diasPorEnfermedadDisponibles: 0,
+        fechaDeAlta: null,
+        fechaDeBaja: null,
       },
       confirmDeleteDialog: false,
       itemToDelete: null,
@@ -513,6 +554,7 @@ export default {
         { title: 'Fecha Fin', key: 'fechaFin'},
         { title: 'Tipo', key: 'tipoVacacion' },
         { title: 'Estado', key: 'estatus' },
+        { title: 'Comentarios', key: 'comentarios' },
         { title: 'Acciones', key: 'actions', sortable: false },
       ],
       searchUsuarios: '',
@@ -520,6 +562,11 @@ export default {
       searchVacaciones: '',
       datePickerMenu: false,
       datePickerMenu2: false,
+      editDatePickerMenu: false,
+      editDatePickerMenu2: false,
+      commentDialog: false,
+      commentingVacation: null,
+      newComment: '',
     };
   },
   computed: {
@@ -708,9 +755,9 @@ export default {
     },
     async approveRequest(request) {
       try {
-        await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/approve/${request.id}?empleadoId=${request.empleado.id}`);
+        await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/approve/<span class="math-inline">\{request\.id\}?empleadoId\=</span>{request.empleado.id}`);
         await this.fetchVacationRequests();
-        await this.employeeStore.fetchEmployeeDetails(); // Keep this line
+        await this.employeeStore.fetchEmployeeDetails();
         alert('Solicitud de vacaciones aprobada exitosamente!');
       } catch (error) {
         console.error('Error approving vacation request:', error);
@@ -720,16 +767,51 @@ export default {
 
     async rejectRequest(request) {
       try {
-        await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/reject/${request.id}?empleadoId=${request.empleado.id}`);
+        await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/reject/<span class="math-inline">\{request\.id\}?empleadoId\=</span>{request.empleado.id}`);
         await this.fetchVacationRequests();
-        await this.employeeStore.fetchEmployeeDetails(); // Keep this line
+        await this.employeeStore.fetchEmployeeDetails();
         alert('Solicitud de vacaciones rechazada exitosamente!');
       } catch (error) {
         console.error('Error rejecting vacation request:', error);
         alert('Error al rechazar solicitud de vacaciones!');
       }
     },
-
+    openCommentDialog(item) {
+      this.commentingVacation = item;
+      this.newComment = item.comentarios || '';
+      this.commentDialog = true;
+    },
+    closeCommentDialog() {
+      this.commentingVacation = null;
+      this.newComment = '';
+      this.commentDialog = false;
+    },
+    async saveComment() {
+      if (this.commentingVacation && this.newComment !== null) {
+        try {
+          await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/update/${this.commentingVacation.id}/comentarios`, this.newComment);
+          this.closeCommentDialog();
+          await this.fetchVacationRequests(); // Refresh the list
+          alert('Comentario guardado exitosamente!');
+        } catch (error) {
+          console.error('Error saving comment:', error);
+          alert('Error al guardar el comentario.');
+        }
+      }
+    },
+    async revokeRequest(item) {
+      if (confirm(`¿Estás seguro de que deseas revocar la solicitud de ${item.empleado.nombre}? Los días de ausencia serán devueltos.`)) {
+        try {
+          await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/revoke/${item.id}?empleadoId=${item.empleado.id}`);
+          await this.fetchVacationRequests(); // Refresh the list
+          await this.employeeStore.fetchEmployeeDetails(); // Update employee's vacation days in store
+          alert('Solicitud de vacaciones revocada y días devueltos exitosamente.');
+        } catch (error) {
+          console.error('Error revoking request:', error);
+          alert('Error al revocar la solicitud.');
+        }
+      }
+    },
     logout() {
       this.employeeStore.logout();
       this.$router.push('/login');

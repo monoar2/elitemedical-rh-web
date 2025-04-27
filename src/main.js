@@ -25,7 +25,8 @@ import {
     faCalendarDay,
     faCalendarWeek,
     faCalendarCheck,
-    faCalendarAlt
+    faCalendarAlt,
+    faComment
 } from '@fortawesome/free-solid-svg-icons';
 import { createPinia } from 'pinia';
 import { useEmployeeStore } from "@/store/employee.js";
@@ -47,7 +48,8 @@ library.add(
     faCalendarDay,
     faCalendarWeek,
     faCalendarCheck,
-    faCalendarAlt
+    faCalendarAlt,
+    faComment
 );
 
 const theme = {
