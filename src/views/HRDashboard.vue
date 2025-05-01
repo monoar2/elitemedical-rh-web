@@ -755,7 +755,7 @@ export default {
     },
     async approveRequest(request) {
       try {
-        await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/approve/<span class="math-inline">\{request\.id\}?empleadoId\=</span>{request.empleado.id}`);
+        await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/approve/${request.id}?empleadoId=${request.empleado.id}`);
         await this.fetchVacationRequests();
         await this.employeeStore.fetchEmployeeDetails();
         alert('Solicitud de vacaciones aprobada exitosamente!');
@@ -767,7 +767,7 @@ export default {
 
     async rejectRequest(request) {
       try {
-        await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/reject/<span class="math-inline">\{request\.id\}?empleadoId\=</span>{request.empleado.id}`);
+        await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/reject/${request.id}?empleadoId=${request.empleado.id}`);
         await this.fetchVacationRequests();
         await this.employeeStore.fetchEmployeeDetails();
         alert('Solicitud de vacaciones rechazada exitosamente!');
