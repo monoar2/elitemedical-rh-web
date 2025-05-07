@@ -12,6 +12,9 @@
 
     <v-main>
       <v-container fluid>
+        <v-overlay :value="loading">
+          <v-progress-circular indeterminate size="80" color="primary"></v-progress-circular>
+        </v-overlay>
         <v-row>
           <v-col cols="12" md="6" class="pa-4">
             <v-card class="elevation-10">
@@ -41,6 +44,7 @@
                 height="400px"
                 @click:row="editUser"
                 :search="searchUsuarios"
+                :loading="loadingUsers"
               >
                 <template v-slot:item.actions="{ item }">
                   <v-btn icon color="red" @click.stop="deleteUser(item.id)">
@@ -78,6 +82,7 @@
                   height="400px"
                   dense
                   @click:row="editEmployee"
+                  :loading="loadingEmployees"
                 >
                   <template v-slot:item.actions="{ item }">
                     <v-btn icon color="red" @click.stop="deleteEmployee(item.id)">
@@ -91,7 +96,7 @@
         </v-row>
 
         <v-dialog v-model="editUserModal" max-width="600px">
-          <v-card>
+          <v-card :loading="loadingEditUser">
             <v-card-title class="headline primary--text">Editar Usuario</v-card-title>
             <v-card-text>
               <v-form ref="editUserForm" v-model="validEditUserForm">
@@ -120,13 +125,13 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeEditUserModal">Cerrar</v-btn>
-              <v-btn color="blue darken-1" text @click="saveUserChanges" :disabled="!validEditUserForm">Guardar</v-btn>
+              <v-btn color="blue darken-1" text @click="saveUserChanges" :disabled="!validEditUserForm || loadingEditUser">Guardar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
 
         <v-dialog v-model="createUserModal" max-width="600px">
-          <v-card>
+          <v-card :loading="loadingCreateUser">
             <v-card-title>
               <span class="text-h5">Crear Usuario</span>
             </v-card-title>
@@ -157,13 +162,13 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeCreateUserModal">Cerrar</v-btn>
-              <v-btn color="blue darken-1" text @click="createUser" :disabled="!validCreateUserForm">Guardar</v-btn>
+              <v-btn color="blue darken-1" text @click="createUser" :disabled="!validCreateUserForm || loadingCreateUser">Guardar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
 
         <v-dialog v-model="createEmployeeModal" max-width="600px">
-          <v-card>
+          <v-card :loading="loadingCreateEmployee">
             <v-card-title>
               <span class="text-h5">Crear Empleado</span>
             </v-card-title>
@@ -235,13 +240,13 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeCreateEmployeeModal">Cerrar</v-btn>
-              <v-btn color="blue darken-1" text @click="saveNewEmployee" :disabled="!validCreateEmployeeForm">Guardar</v-btn>
+              <v-btn color="blue darken-1" text @click="saveNewEmployee" :disabled="!validCreateEmployeeForm || loadingCreateEmployee">Guardar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
 
         <v-dialog v-model="editEmployeeModal" max-width="600px">
-          <v-card>
+          <v-card :loading="loadingEditEmployee">
             <v-card-title>
               <span class="text-h5">Editar Empleado</span>
             </v-card-title>
@@ -378,6 +383,7 @@
                     class="elevation-1"
                     height="550px"
                     dense
+                    :loading="loadingVacations"
                 >
                   <template v-slot:header="{ props }">
                     <thead>
@@ -404,7 +410,9 @@
                     {{ item.estatus || 'Pendiente' }}
                   </template>
                   <template v-slot:item.comentarios="{ item }">
-                    {{ item.comentarios }}
+                    <div style="white-space: normal; word-break: break-word;">
+                      {{ decodeURIComponent(item.comentarios).replaceAll('+', ' ') }}
+                    </div>
                   </template>
                   <template v-slot:item.actions="{ item }">
                     <v-btn
@@ -490,6 +498,15 @@ export default {
   components: { Notification },
   data() {
     return {
+      loading: false,
+      loadingUsers: false,
+      loadingEmployees: false,
+      loadingVacations: false,
+      loadingApproveRejectRevoke: false,
+      loadingEditUser: false,
+      loadingCreateUser: false,
+      loadingCreateEmployee: false,
+      loadingEditEmployee: false,
       users: [],
       employees: [],
       vacationTypes: [],
@@ -536,9 +553,9 @@ export default {
         { title: 'Acciones', key: 'actions', sortable: false },
       ],
       employeeHeaders: [
-        { title: 'Nombre', key: 'nombre'},
+        { title: 'Nombre', key: 'nombre' },
         { title: 'Apellido Paterno', key: 'apellidoPaterno' },
-        { title: 'Apellido Materno', key: 'apellidoMaterno'},
+        { title: 'Apellido Materno', key: 'apellidoMaterno' },
         { title: 'Correo', key: 'correo' },
         { title: 'Teléfono', key: 'telefono' },
         { title: 'Vacaciones Disponibles', key: 'vacacionesDisponibles' },
@@ -550,8 +567,8 @@ export default {
       ],
       vacationHeaders: [
         { title: 'Empleado', key: 'empleado' },
-        { title: 'Fecha Inicio', key: 'fechaInicio'},
-        { title: 'Fecha Fin', key: 'fechaFin'},
+        { title: 'Fecha Inicio', key: 'fechaInicio' },
+        { title: 'Fecha Fin', key: 'fechaFin' },
         { title: 'Tipo', key: 'tipoVacacion' },
         { title: 'Estado', key: 'estatus' },
         { title: 'Comentarios', key: 'comentarios' },
@@ -583,20 +600,26 @@ export default {
       console.log("Clicked item: ", row.item)
     },
     async fetchRoles() {
+      this.loading = true;
       try {
         const response = await axios.get('https://elitemedicalbajio.online/rh/roles/get');
         this.roles = response.data;
       } catch (error) {
         console.error('Error fetching roles:', error);
+      } finally {
+        this.loading = false;
       }
     },
 
     async fetchUsers() {
+      this.loadingUsers = true;
       try {
         const response = await axios.get('https://elitemedicalbajio.online/rh/usuarios/get');
         this.users = response.data;
       } catch (error) {
         console.error('Error fetching users:', error);
+      } finally {
+        this.loadingUsers = false;
       }
     },
 
@@ -612,6 +635,7 @@ export default {
 
     async createUser() {
       if (this.$refs.createUserForm.validate()) {
+        this.loadingCreateUser = true;
         const newUserDTO = {
           nombre: this.newUser.nombre,
           password: this.newUser.password,
@@ -622,10 +646,12 @@ export default {
           await axios.post('https://elitemedicalbajio.online/rh/usuarios/save', newUserDTO);
           this.fetchUsers();
           this.closeCreateUserModal();
-          alert('Usuario creado exitosamente!');
+          this.$toast.success('Usuario creado exitosamente!');
         } catch (error) {
           console.error('Error saving user:', error);
-          alert('Error al crear usuario!');
+          this.$toast.error('Error al crear usuario!');
+        } finally {
+          this.loadingCreateUser = false;
         }
       }
     },
@@ -640,31 +666,37 @@ export default {
     },
     async saveUserChanges() {
       if (this.$refs.editUserForm.validate()) {
+        this.loadingEditUser = true;
         const usuarioDTO = {
           id: this.editingUser.id,
           nombre: this.editingUser.nombre,
-          role:   this.editingUser.role,
+          role: this.editingUser.role,
           password: this.editingUser.password,
-          empleadoId: this.editingUser.empleado.id ,
+          empleadoId: this.editingUser.empleado.id,
         };
         try {
           await axios.post('https://elitemedicalbajio.online/rh/usuarios/update', usuarioDTO);
           this.fetchUsers();
           this.closeEditUserModal();
-          alert('Usuario actualizado exitosamente!');
+          this.$toast.success('Usuario actualizado exitosamente!');
         } catch (error) {
           console.error('Error updating user:', error);
-          alert('Error al actualizar usuario!');
+          this.$toast.error('Error al actualizar usuario!');
+        } finally {
+          this.loadingEditUser = false;
         }
       }
     },
 
     async fetchEmployees() {
+      this.loadingEmployees = true;
       try {
         const response = await axios.get('https://elitemedicalbajio.online/rh/empleados/get');
         this.employees = response.data;
       } catch (error) {
         console.error('Error fetching employees:', error);
+      } finally {
+        this.loadingEmployees = false;
       }
     },
     createEmployee() {
@@ -687,14 +719,17 @@ export default {
     },
     async saveNewEmployee() {
       if (this.$refs.createEmployeeForm.validate()) {
+        this.loadingCreateEmployee = true;
         try {
           await axios.post('https://elitemedicalbajio.online/rh/empleados/save', this.newEmployee);
           this.fetchEmployees();
           this.closeCreateEmployeeModal();
-          alert('Empleado creado exitosamente!');
+          this.$toast.success('Empleado creado exitosamente!');
         } catch (error) {
           console.error('Error saving employee:', error);
-          alert('Error al crear empleado!');
+          this.$toast.error('Error al crear empleado!');
+        } finally {
+          this.loadingCreateEmployee = false;
         }
       }
     },
@@ -708,14 +743,17 @@ export default {
     },
     async saveEmployeeChanges() {
       if (this.$refs.editEmployeeForm.validate()) {
+        this.loadingEditEmployee = true;
         try {
           await axios.post('https://elitemedicalbajio.online/rh/empleados/update', this.editingEmployee);
           this.fetchEmployees();
           this.closeEditEmployeeModal();
-          alert('Empleado actualizado exitosamente!');
+          this.$toast.success('Empleado actualizado exitosamente!');
         } catch (error) {
           console.error('Error updating employee:', error);
-          alert('Error al actualizar empleado!');
+          this.$toast.error('Error al actualizar empleado!');
+        } finally {
+          this.loadingEditEmployee = false;
         }
       }
     },
@@ -728,52 +766,64 @@ export default {
       this.confirmDeleteDialog = true;
     },
     async confirmDelete() {
+      this.loading = true;
       try {
         if (this.itemToDelete.type === 'user') {
           await axios.delete(`https://elitemedicalbajio.online/rh/usuarios/delete/${this.itemToDelete.id}`);
           this.fetchUsers();
-          alert('Usuario eliminado exitosamente!');
+          this.$toast.success('Usuario eliminado exitosamente!');
         } else if (this.itemToDelete.type === 'employee') {
           await axios.delete(`https://elitemedicalbajio.online/rh/empleados/delete/${this.itemToDelete.id}`);
           this.fetchEmployees();
-          alert('Empleado eliminado exitosamente!');
+          this.$toast.success('Empleado eliminado exitosamente!');
         }
       } catch (error) {
         console.error(`Error deleting ${this.itemToDelete.type}:`, error);
-        alert(`Error al eliminar ${this.itemToDelete.type === 'user' ? 'usuario' : 'empleado'}!`);
+        this.$toast.error(`Error al eliminar ${this.itemToDelete.type === 'user' ? 'usuario' : 'empleado'}!`);
+      } finally {
+        this.confirmDeleteDialog = false;
+        this.loading = false;
       }
-      this.confirmDeleteDialog = false;
     },
 
     async fetchVacationRequests() {
+      this.loadingVacations = true;
       try {
         const response = await axios.get('https://elitemedicalbajio.online/rh/vacaciones/get');
         this.vacationRequests = response.data;
       } catch (error) {
         console.error('Error fetching vacation requests:', error);
+      } finally {
+        this.loadingVacations = false;
       }
     },
     async approveRequest(request) {
+      this.loadingApproveRejectRevoke = true;
       try {
         await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/approve/${request.id}?empleadoId=${request.empleado.id}`);
         await this.fetchVacationRequests();
         await this.employeeStore.fetchEmployeeDetails();
-        alert('Solicitud de vacaciones aprobada exitosamente!');
+        this.$toast.success('Solicitud de vacaciones aprobada exitosamente!');
       } catch (error) {
         console.error('Error approving vacation request:', error);
-        alert('Error al aprobar solicitud de vacaciones!');
+        this.$toast.error('Error al aprobar solicitud de vacaciones!');
+      } finally {
+        this.loadingApproveRejectRevoke = false;
       }
     },
 
     async rejectRequest(request) {
+      this.loadingApproveRejectRevoke = true;
       try {
         await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/reject/${request.id}?empleadoId=${request.empleado.id}`);
         await this.fetchVacationRequests();
         await this.employeeStore.fetchEmployeeDetails();
-        alert('Solicitud de vacaciones rechazada exitosamente!');
+        this.$toast.success('Solicitud de vacaciones rechazada exitosamente!');
       } catch (error) {
         console.error('Error rejecting vacation request:', error);
-        alert('Error al rechazar solicitud de vacaciones!');
+        this.$toast.error('Error al rechazar solicitud de vacaciones!');
+      } finally {
+        this.loadingApproveRejectRevoke = false;
       }
     },
     openCommentDialog(item) {
@@ -788,27 +838,33 @@ export default {
     },
     async saveComment() {
       if (this.commentingVacation && this.newComment !== null) {
+        this.loadingVacations = true;
         try {
           await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/update/${this.commentingVacation.id}/comentarios`, this.newComment);
           this.closeCommentDialog();
           await this.fetchVacationRequests(); // Refresh the list
-          alert('Comentario guardado exitosamente!');
+          this.$toast.success('Comentario guardado exitosamente!');
         } catch (error) {
           console.error('Error saving comment:', error);
-          alert('Error al guardar el comentario.');
+          this.$toast.error('Error al guardar el comentario.');
+        } finally {
+          this.loadingVacations = false;
         }
       }
     },
     async revokeRequest(item) {
+      this.loadingApproveRejectRevoke = true;
       if (confirm(`¿Estás seguro de que deseas revocar la solicitud de ${item.empleado.nombre}? Los días de ausencia serán devueltos.`)) {
         try {
           await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/revoke/${item.id}?empleadoId=${item.empleado.id}`);
           await this.fetchVacationRequests(); // Refresh the list
           await this.employeeStore.fetchEmployeeDetails(); // Update employee's vacation days in store
-          alert('Solicitud de vacaciones revocada y días devueltos exitosamente.');
+          this.$toast.success('Solicitud de vacaciones revocada y días devueltos exitosamente.');
         } catch (error) {
           console.error('Error revoking request:', error);
-          alert('Error al revocar la solicitud.');
+          this.$toast.error('Error al revocar la solicitud.');
+        } finally {
+          this.loadingApproveRejectRevoke = false;
         }
       }
     },
