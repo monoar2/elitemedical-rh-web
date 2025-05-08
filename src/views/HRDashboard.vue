@@ -179,7 +179,7 @@
                 <v-text-field v-model="newEmployee.apellidoMaterno" label="Apellido Materno" required :rules="[v => !!v || 'Apellido Materno es requerido']"></v-text-field>
                 <v-text-field v-model="newEmployee.correo" label="Correo" type="email" required :rules="[v => !!v || 'Correo es requerido', v => /.+@.+\..+/.test(v) || 'Correo debe ser válido']"></v-text-field>
                 <v-text-field v-model="newEmployee.telefono" label="Teléfono" required :rules="[v => !!v || 'Teléfono es requerido']"></v-text-field>
-                <v-text-field v-model="newEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+                <v-text-field v-model="newEmployee.vacacionesDisponibles" label="Días proporcionales a los meses trabajados" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
                 <v-text-field v-model="newEmployee.diasPorEnfermedadDisponibles" label="Ausencias Justificadas" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
                 <!-- First Date Picker (fechaDeAlta) -->
                 <v-menu
@@ -285,7 +285,7 @@
                 ></v-text-field>
                 <v-text-field
                     v-model="editingEmployee.vacacionesDisponibles"
-                    label="Vacaciones Disponibles"
+                    label="Días proporcionales a los meses trabajados"
                     type="number"
                     required
                     :rules="[v => v >= 0 || 'Debe ser un número positivo']"
@@ -558,7 +558,7 @@ export default {
         { title: 'Apellido Materno', key: 'apellidoMaterno' },
         { title: 'Correo', key: 'correo' },
         { title: 'Teléfono', key: 'telefono' },
-        { title: 'Vacaciones Disponibles', key: 'vacacionesDisponibles' },
+        { title: 'Días proporcionales a los meses trabajados', key: 'vacacionesDisponibles' },
         { title: 'Ausencias Justificadas Disponibles', key: 'diasPorEnfermedadDisponibles' },
         { title: 'Fecha de ingreso', key: 'fechaDeAlta' },
         { title: 'Fecha de baja', key: 'fechaDeBaja' },
