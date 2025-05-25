@@ -179,8 +179,10 @@
                 <v-text-field v-model="newEmployee.apellidoMaterno" label="Apellido Materno" required :rules="[v => !!v || 'Apellido Materno es requerido']"></v-text-field>
                 <v-text-field v-model="newEmployee.correo" label="Correo" type="email" required :rules="[v => !!v || 'Correo es requerido', v => /.+@.+\..+/.test(v) || 'Correo debe ser válido']"></v-text-field>
                 <v-text-field v-model="newEmployee.telefono" label="Teléfono" required :rules="[v => !!v || 'Teléfono es requerido']"></v-text-field>
-                <v-text-field v-model="newEmployee.vacacionesDisponibles" label="Días proporcionales a los meses trabajados" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
-                <v-text-field v-model="newEmployee.diasPorEnfermedadDisponibles" label="Ausencias Justificadas" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+                <v-text-field v-model="newEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+                <v-text-field v-model="newEmployee.ausenciasJustificadas" label="Ausencias Justificadas" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+                <v-text-field v-model="newEmployee.diasDevengados" label="Dias Devengados" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
+
                 <!-- First Date Picker (fechaDeAlta) -->
                 <v-menu
                     v-model="datePickerMenu"
@@ -285,14 +287,21 @@
                 ></v-text-field>
                 <v-text-field
                     v-model="editingEmployee.vacacionesDisponibles"
-                    label="Días proporcionales a los meses trabajados"
+                    label="Vacaciones Disponibles"
                     type="number"
                     required
                     :rules="[v => v >= 0 || 'Debe ser un número positivo']"
                 ></v-text-field>
                 <v-text-field
-                    v-model="editingEmployee.diasPorEnfermedadDisponibles"
+                    v-model="editingEmployee.ausenciasJustificadas"
                     label="Ausencias Justificadas Disponibles"
+                    type="number"
+                    required
+                    :rules="[v => v >= 0 || 'Debe ser un número positivo']"
+                ></v-text-field>
+                <v-text-field
+                    v-model="editingEmployee.diasDevengados"
+                    label="Dias Devengados Disponibles"
                     type="number"
                     required
                     :rules="[v => v >= 0 || 'Debe ser un número positivo']"
@@ -529,7 +538,8 @@ export default {
         correo: '',
         telefono: '',
         vacacionesDisponibles: 0,
-        diasPorEnfermedadDisponibles: 0,
+        ausenciasJustificadas: 0,
+        diasDevengados: 0,
         fechaDeAlta: null,
         fechaDeBaja: null,
       },
@@ -541,7 +551,8 @@ export default {
         correo: '',
         telefono: '',
         vacacionesDisponibles: 0,
-        diasPorEnfermedadDisponibles: 0,
+        ausenciasJustificadas: 0,
+        diasDevengados: 0,
         fechaDeAlta: null,
         fechaDeBaja: null,
       },
@@ -558,8 +569,9 @@ export default {
         { title: 'Apellido Materno', key: 'apellidoMaterno' },
         { title: 'Correo', key: 'correo' },
         { title: 'Teléfono', key: 'telefono' },
-        { title: 'Días proporcionales a los meses trabajados', key: 'vacacionesDisponibles' },
-        { title: 'Ausencias Justificadas Disponibles', key: 'diasPorEnfermedadDisponibles' },
+        { title: 'Vacaciones Disponibles', key: 'vacacionesDisponibles' },
+        { title: 'Ausencias Justificadas Disponibles', key: 'ausenciasJustificadas' },
+        { title: 'Días Devengados', key: 'diasDevengados' },
         { title: 'Fecha de ingreso', key: 'fechaDeAlta' },
         { title: 'Fecha de baja', key: 'fechaDeBaja' },
         { title: 'Usuario', key: 'usuario.nombre' },
@@ -712,7 +724,8 @@ export default {
         correo: '',
         telefono: '',
         vacacionesDisponibles: 0,
-        diasPorEnfermedadDisponibles: 0,
+        ausenciasJustificadas: 0,
+        diasDevengados: 0,
         fechaDeAlta: null,
         fechaDeBaja: null,
       };

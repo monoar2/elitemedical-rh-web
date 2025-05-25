@@ -35,7 +35,10 @@
                     <v-label>Vacaciones disponibles:</v-label> {{ employeeStore.getEmployee?.empleado?.vacacionesDisponibles }}
                   </v-col>
                   <v-col>
-                    <v-label>Ausencia Justificada:</v-label> {{ employeeStore.getEmployee?.empleado?.diasPorEnfermedadDisponibles }}
+                    <v-label>Ausencia Justificada:</v-label> {{ employeeStore.getEmployee?.empleado?.ausenciasJustificadas }}
+                  </v-col>
+                  <v-col>
+                    <v-label>Ausencia Justificada:</v-label> {{ employeeStore.getEmployee?.empleado?.diasDevengados }}
                   </v-col>
                 </v-row>
               </v-card-subtitle>
