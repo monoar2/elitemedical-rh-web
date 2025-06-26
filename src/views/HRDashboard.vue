@@ -23,11 +23,11 @@
                 GESTIONAR USUARIOS
                 <font-awesome-icon :icon="['fas', 'user']" />
               </v-card-title>
-           
+
                 <v-btn color="primary" class="mb-6 elevation-2" @click="openCreateUserModal">
                   Crear usuario
                 </v-btn>
-             
+
               <v-text-field
                 v-model="searchUsuarios"
                 append-icon="search"
@@ -84,6 +84,9 @@
                   @click:row="editEmployee"
                   :loading="loadingEmployees"
                 >
+                  <template v-slot:item.diasDelAnio="{ item }">
+                    {{ item.diasDevengados - item.vacacionesDisponibles }}
+                  </template>
                   <template v-slot:item.actions="{ item }">
                     <v-btn icon color="red" @click.stop="deleteEmployee(item.id)">
                       <font-awesome-icon :icon="['fas', 'user-minus']" />
@@ -572,6 +575,7 @@ export default {
         { title: 'Vacaciones Disponibles', key: 'vacacionesDisponibles' },
         { title: 'Ausencias Justificadas Disponibles', key: 'ausenciasJustificadas' },
         { title: 'Días Devengados', key: 'diasDevengados' },
+        { title: 'Días del año en curso', key: 'diasDelAnio' },
         { title: 'Fecha de ingreso', key: 'fechaDeAlta' },
         { title: 'Fecha de baja', key: 'fechaDeBaja' },
         { title: 'Usuario', key: 'usuario.nombre' },
