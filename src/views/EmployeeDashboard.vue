@@ -23,22 +23,10 @@
               <v-card-subtitle>
                 <v-row>
                   <v-col>
-                    <v-label>Nombre:</v-label> {{ employeeStore.getEmployee?.empleado?.nombre }} {{ employeeStore.getEmployee?.empleado?.apellidoPaterno }} {{ employeeStore.getEmployee?.empleado?.apellidoMaterno }}
-                  </v-col>
-                  <v-col>
-                    <v-label>Email:</v-label> {{ employeeStore.getEmployee?.empleado?.correo }}
-                  </v-col>
-                  <v-col>
-                    <v-label>Teléfono:</v-label> {{ employeeStore.getEmployee?.empleado?.telefono }}
-                  </v-col>
-                  <v-col>
                     <v-label>Vacaciones disponibles:</v-label> {{ employeeStore.getEmployee?.empleado?.vacacionesDisponibles }}
                   </v-col>
                   <v-col>
                     <v-label>Ausencia Justificada:</v-label> {{ employeeStore.getEmployee?.empleado?.ausenciasJustificadas }}
-                  </v-col>
-                  <v-col>
-                    <v-label>Ausencia Justificada:</v-label> {{ employeeStore.getEmployee?.empleado?.diasDevengados }}
                   </v-col>
                 </v-row>
               </v-card-subtitle>
