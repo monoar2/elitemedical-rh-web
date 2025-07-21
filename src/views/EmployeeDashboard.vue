@@ -20,16 +20,82 @@
               <v-card-title class="primary--text text-center">INFORMACIÓN DEL EMPLEADO
                 <font-awesome-icon :icon="['fas', 'address-card']" />
               </v-card-title>
-              <v-card-subtitle>
+              <v-card-text>
                 <v-row>
-                  <v-col>
-                    <v-label>Vacaciones disponibles:</v-label> {{ employeeStore.getEmployee?.empleado?.vacacionesDisponibles }}
+                  <v-col cols="12" md="6">
+                    <v-card outlined class="pa-3 mb-3">
+                      <v-card-title class="text-subtitle-1 primary--text">Información Básica</v-card-title>
+                      <v-card-text>
+                        <v-row>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Vacaciones disponibles:</v-list-item-title>
+                              <v-list-item-subtitle>{{ employeeStore.getEmployee?.empleado?.vacacionesDisponibles }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Ausencia Justificada:</v-list-item-title>
+                              <v-list-item-subtitle>{{ employeeStore.getEmployee?.empleado?.ausenciasJustificadas }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
                   </v-col>
-                  <v-col>
-                    <v-label>Ausencia Justificada:</v-label> {{ employeeStore.getEmployee?.empleado?.ausenciasJustificadas }}
+                  <v-col cols="12" md="6">
+                    <v-card outlined class="pa-3 mb-3">
+                      <v-card-title class="text-subtitle-1 primary--text">Métricas de Vacaciones</v-card-title>
+                      <v-card-text v-if="employeeStore.getEmployee?.empleado?.fechaDeAlta">
+                        <v-row>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Trabajados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateDaysWorked(employeeStore.getEmployee?.empleado?.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Años Trabajados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateYearsWorked(employeeStore.getEmployee?.empleado?.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Meses Trabajados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateMonthsWorked(employeeStore.getEmployee?.empleado?.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días de Vacaciones:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateVacationDays(employeeStore.getEmployee?.empleado?.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Proporcionales:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateProportionalDays(employeeStore.getEmployee?.empleado?.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Disponibles 2025:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateAvailableDays(employeeStore.getEmployee?.empleado?.fechaDeAlta, employeeStore.getEmployee?.empleado?.diasDevengados - employeeStore.getEmployee?.empleado?.vacacionesDisponibles) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Acumulados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateAccumulatedDays(employeeStore.getEmployee?.empleado?.fechaDeAlta, employeeStore.getEmployee?.empleado?.diasDevengados - employeeStore.getEmployee?.empleado?.vacacionesDisponibles) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                        </v-row>
+                      </v-card-text>
+                    </v-card>
                   </v-col>
                 </v-row>
-              </v-card-subtitle>
+              </v-card-text>
             </v-card>
           </v-col>
 
@@ -65,8 +131,8 @@
                           hide-header="true"
                       />
                     </v-col>
-                    
-                    
+
+
                   </v-row>
                   <v-row>
                     TIPO DE AUSENCIA
@@ -130,6 +196,7 @@ import axios from 'axios';
 import { useEmployeeStore } from '@/store/employee';
 import Notification from '@/components/Notification.vue';
 import { Text } from 'vue';
+import { calculateVacationMetrics } from '@/services/vacationCalculator';
 
 export default {
   components: { Notification },
@@ -157,6 +224,34 @@ export default {
     };
   },
   methods: {
+    calculateDaysWorked(hireDate) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate).daysWorked;
+    },
+    calculateYearsWorked(hireDate) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate).yearsWorked;
+    },
+    calculateMonthsWorked(hireDate) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate).monthsWorked;
+    },
+    calculateVacationDays(hireDate) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate).vacationDays;
+    },
+    calculateProportionalDays(hireDate) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate).proportionalDays;
+    },
+    calculateAvailableDays(hireDate, daysTaken) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate, daysTaken).availableDays;
+    },
+    calculateAccumulatedDays(hireDate, daysTaken) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate, daysTaken).accumulatedDays;
+    },
     async handleLogout() {
       this.employeeStore.logout();
       this.$router.push('/login');
