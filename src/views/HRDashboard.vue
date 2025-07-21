@@ -84,8 +84,29 @@
                   @click:row="editEmployee"
                   :loading="loadingEmployees"
                 >
-                  <template v-slot:item.diasDelAnio="{ item }">
+                  <template v-slot:item.diasTrabajados="{ item }">
+                    {{ calculateDaysWorked(item.fechaDeAlta) }}
+                  </template>
+                  <template v-slot:item.anosTrabajados="{ item }">
+                    {{ calculateYearsWorked(item.fechaDeAlta) }}
+                  </template>
+                  <template v-slot:item.mesesTrabajados="{ item }">
+                    {{ calculateMonthsWorked(item.fechaDeAlta) }}
+                  </template>
+                  <template v-slot:item.diasVacaciones="{ item }">
+                    {{ calculateVacationDays(item.fechaDeAlta) }}
+                  </template>
+                  <template v-slot:item.diasProporcionales="{ item }">
+                    {{ calculateProportionalDays(item.fechaDeAlta) }}
+                  </template>
+                  <template v-slot:item.diasTomados="{ item }">
                     {{ item.diasDevengados - item.vacacionesDisponibles }}
+                  </template>
+                  <template v-slot:item.diasDisponibles="{ item }">
+                    {{ calculateAvailableDays(item.fechaDeAlta, item.diasDevengados - item.vacacionesDisponibles) }}
+                  </template>
+                  <template v-slot:item.diasAcumulados="{ item }">
+                    {{ calculateAccumulatedDays(item.fechaDeAlta, item.diasDevengados - item.vacacionesDisponibles) }}
                   </template>
                   <template v-slot:item.actions="{ item }">
                     <v-btn icon color="red" @click.stop="deleteEmployee(item.id)">
@@ -182,6 +203,52 @@
                 <v-text-field v-model="newEmployee.apellidoMaterno" label="Apellido Materno" required :rules="[v => !!v || 'Apellido Materno es requerido']"></v-text-field>
                 <v-text-field v-model="newEmployee.correo" label="Correo" type="email" required :rules="[v => !!v || 'Correo es requerido', v => /.+@.+\..+/.test(v) || 'Correo debe ser válido']"></v-text-field>
                 <v-text-field v-model="newEmployee.telefono" label="Teléfono" required :rules="[v => !!v || 'Teléfono es requerido']"></v-text-field>
+
+                <v-row>
+                  <v-col cols="12">
+                    <v-card outlined class="pa-3 mb-3">
+                      <v-card-title class="text-subtitle-1 primary--text">Información de Vacaciones</v-card-title>
+                      <v-card-text>
+                        <v-row v-if="newEmployee.fechaDeAlta">
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Trabajados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateDaysWorked(newEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Años Trabajados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateYearsWorked(newEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Meses Trabajados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateMonthsWorked(newEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días de Vacaciones:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateVacationDays(newEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Proporcionales:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateProportionalDays(newEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                        </v-row>
+                        <v-alert v-else type="info" dense>
+                          Seleccione una fecha de alta para ver los cálculos de vacaciones
+                        </v-alert>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+
                 <v-text-field v-model="newEmployee.vacacionesDisponibles" label="Vacaciones Disponibles" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
                 <v-text-field v-model="newEmployee.ausenciasJustificadas" label="Ausencias Justificadas" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
                 <v-text-field v-model="newEmployee.diasDevengados" label="Dias Devengados" type="number" required :rules="[v => v >= 0 || 'Debe ser un número positivo']"></v-text-field>
@@ -288,6 +355,70 @@
                     required
                     :rules="[v => !!v || 'Teléfono es requerido']"
                 ></v-text-field>
+
+                <v-row>
+                  <v-col cols="12">
+                    <v-card outlined class="pa-3 mb-3">
+                      <v-card-title class="text-subtitle-1 primary--text">Información de Vacaciones</v-card-title>
+                      <v-card-text>
+                        <v-row v-if="editingEmployee.fechaDeAlta">
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Trabajados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateDaysWorked(editingEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Años Trabajados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateYearsWorked(editingEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Meses Trabajados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateMonthsWorked(editingEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días de Vacaciones:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateVacationDays(editingEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Proporcionales:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateProportionalDays(editingEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Tomados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ editingEmployee.diasDevengados - editingEmployee.vacacionesDisponibles }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Disponibles 2025:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateAvailableDays(editingEmployee.fechaDeAlta, editingEmployee.diasDevengados - editingEmployee.vacacionesDisponibles) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                          <v-col cols="6">
+                            <v-list-item>
+                              <v-list-item-title>Días Acumulados:</v-list-item-title>
+                              <v-list-item-subtitle>{{ calculateAccumulatedDays(editingEmployee.fechaDeAlta, editingEmployee.diasDevengados - editingEmployee.vacacionesDisponibles) }}</v-list-item-subtitle>
+                            </v-list-item>
+                          </v-col>
+                        </v-row>
+                        <v-alert v-else type="info" dense>
+                          Seleccione una fecha de alta para ver los cálculos de vacaciones
+                        </v-alert>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+
                 <v-text-field
                     v-model="editingEmployee.vacacionesDisponibles"
                     label="Vacaciones Disponibles"
@@ -505,6 +636,7 @@
 import axios from 'axios';
 import { useEmployeeStore } from '@/store/employee';
 import Notification from '@/components/Notification.vue';
+import { calculateVacationMetrics } from '@/services/vacationCalculator';
 
 export default {
   components: { Notification },
@@ -572,10 +704,14 @@ export default {
         { title: 'Apellido Materno', key: 'apellidoMaterno' },
         { title: 'Correo', key: 'correo' },
         { title: 'Teléfono', key: 'telefono' },
-        { title: 'Vacaciones Disponibles', key: 'vacacionesDisponibles' },
-        { title: 'Ausencias Justificadas Disponibles', key: 'ausenciasJustificadas' },
-        { title: 'Días Devengados', key: 'diasDevengados' },
-        { title: 'Días del año en curso', key: 'diasDelAnio' },
+        { title: 'Días Trabajados', key: 'diasTrabajados' },
+        { title: 'Años Trabajados', key: 'anosTrabajados' },
+        { title: 'Meses Trabajados', key: 'mesesTrabajados' },
+        { title: 'Días de Vacaciones', key: 'diasVacaciones' },
+        { title: 'Días Proporcionales', key: 'diasProporcionales' },
+        { title: 'Días Tomados', key: 'diasTomados' },
+        { title: 'Días Disponibles 2025', key: 'diasDisponibles' },
+        { title: 'Días Acumulados', key: 'diasAcumulados' },
         { title: 'Fecha de ingreso', key: 'fechaDeAlta' },
         { title: 'Fecha de baja', key: 'fechaDeBaja' },
         { title: 'Usuario', key: 'usuario.nombre' },
@@ -612,6 +748,34 @@ export default {
     return { employeeStore };
   },
   methods: {
+    calculateDaysWorked(hireDate) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate).daysWorked;
+    },
+    calculateYearsWorked(hireDate) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate).yearsWorked;
+    },
+    calculateMonthsWorked(hireDate) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate).monthsWorked;
+    },
+    calculateVacationDays(hireDate) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate).vacationDays;
+    },
+    calculateProportionalDays(hireDate) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate).proportionalDays;
+    },
+    calculateAvailableDays(hireDate, daysTaken) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate, daysTaken).availableDays;
+    },
+    calculateAccumulatedDays(hireDate, daysTaken) {
+      if (!hireDate) return 0;
+      return calculateVacationMetrics(hireDate, daysTaken).accumulatedDays;
+    },
     handleClick(event, row) {
       console.log("Clicked item: ", row.item)
     },
