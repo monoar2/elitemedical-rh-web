@@ -769,8 +769,8 @@ export default {
       return calculateVacationMetrics(hireDate).proportionalDays;
     },
     calculateAvailableDays(hireDate, daysTaken) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate, daysTaken).availableDays;
+      // Always return 0 for "Días Disponibles 2025" as required
+      return 0;
     },
     calculateAccumulatedDays(hireDate, daysTaken) {
       if (!hireDate) return 0;
