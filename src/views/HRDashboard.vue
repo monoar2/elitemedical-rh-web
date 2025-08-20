@@ -84,30 +84,14 @@
                   @click:row="editEmployee"
                   :loading="loadingEmployees"
                 >
-                  <template v-slot:item.diasTrabajados="{ item }">
-                    {{ calculateDaysWorked(item.fechaDeAlta) }}
-                  </template>
-                  <template v-slot:item.anosTrabajados="{ item }">
-                    {{ calculateYearsWorked(item.fechaDeAlta) }}
-                  </template>
-                  <template v-slot:item.mesesTrabajados="{ item }">
-                    {{ calculateMonthsWorked(item.fechaDeAlta) }}
-                  </template>
-                  <template v-slot:item.diasVacaciones="{ item }">
-                    {{ calculateVacationDays(item.fechaDeAlta) }}
-                  </template>
-                  <template v-slot:item.diasProporcionales="{ item }">
-                    {{ calculateProportionalDays(item.fechaDeAlta) }}
-                  </template>
-                  <template v-slot:item.diasTomados="{ item }">
-                    {{ calculateDaysTaken(item.id) }}
-                  </template>
-                  <template v-slot:item.diasDisponibles="{ item }">
-                    {{ calculateAvailableDays(item.fechaDeAlta, calculateDaysTaken(item.id)) }}
-                  </template>
-                  <template v-slot:item.diasAcumulados="{ item }">
-                    {{ calculateAccumulatedDays(item.fechaDeAlta, calculateDaysTaken(item.id)) }}
-                  </template>
+                  <template v-slot:item.diasTrabajados="{ item }">{{ item.diasTrabajados ?? 0 }}</template>
+                  <template v-slot:item.anosTrabajados="{ item }">{{ item.anosTrabajados ?? 0 }}</template>
+                  <template v-slot:item.mesesTrabajados="{ item }">{{ item.mesesTrabajados ?? 0 }}</template>
+                  <template v-slot:item.diasVacaciones="{ item }">{{ item.diasVacaciones ?? 0 }}</template>
+                  <template v-slot:item.diasProporcionales="{ item }">{{ item.diasProporcionales ?? 0 }}</template>
+                  <template v-slot:item.diasTomados="{ item }">{{ item.diasTomados ?? 0 }}</template>
+                  <template v-slot:item.diasDisponibles="{ item }">{{ item.diasDisponibles ?? 0 }}</template>
+                  <template v-slot:item.diasAcumulados="{ item }">{{ item.diasAcumulados ?? 0 }}</template>
                   <template v-slot:item.actions="{ item }">
                     <v-btn icon color="red" @click.stop="deleteEmployee(item.id)">
                       <font-awesome-icon :icon="['fas', 'user-minus']" />
@@ -636,7 +620,6 @@
 import axios from 'axios';
 import { useEmployeeStore } from '@/store/employee';
 import Notification from '@/components/Notification.vue';
-import { calculateVacationMetrics } from '@/services/vacationCalculator';
 
 export default {
   components: { Notification },
@@ -748,54 +731,6 @@ export default {
     return { employeeStore };
   },
   methods: {
-    calculateDaysWorked(hireDate) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate).daysWorked;
-    },
-    calculateYearsWorked(hireDate) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate).yearsWorked;
-    },
-    calculateMonthsWorked(hireDate) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate).monthsWorked;
-    },
-    calculateVacationDays(hireDate) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate).vacationDays;
-    },
-    calculateProportionalDays(hireDate) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate).proportionalDays;
-    },
-    calculateAvailableDays(hireDate, daysTaken) {
-      // Always return 0 for "Días Disponibles 2025" as required
-      return 0;
-    },
-    calculateAccumulatedDays(hireDate, daysTaken) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate, daysTaken).accumulatedDays;
-    },
-    calculateDaysTaken(employeeId) {
-      // Filter vacation requests to find those that match the employee ID and are approved
-      const employeeVacations = this.vacationRequests.filter(
-        vacation => vacation.empleado && vacation.empleado.id === employeeId && vacation.estatus === 'APROBADA'
-      );
-
-      // Calculate total days taken from the matching vacation requests
-      let totalDaysTaken = 0;
-      for (const vacation of employeeVacations) {
-        if (vacation.fechaInicio && vacation.fechaFin) {
-          const startDate = new Date(vacation.fechaInicio);
-          const endDate = new Date(vacation.fechaFin);
-          const diffTime = Math.abs(endDate - startDate);
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end dates
-          totalDaysTaken += diffDays;
-        }
-      }
-
-      return totalDaysTaken;
-    },
     handleClick(event, row) {
       console.log("Clicked item: ", row.item)
     },

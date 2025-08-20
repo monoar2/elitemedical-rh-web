@@ -51,43 +51,43 @@
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días Trabajados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateDaysWorked(employeeStore.getEmployee?.empleado?.fechaDeAlta) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ employeeStore.getEmployee?.empleado?.diasTrabajados ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Años Trabajados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateYearsWorked(employeeStore.getEmployee?.empleado?.fechaDeAlta) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ employeeStore.getEmployee?.empleado?.anosTrabajados ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Meses Trabajados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateMonthsWorked(employeeStore.getEmployee?.empleado?.fechaDeAlta) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ employeeStore.getEmployee?.empleado?.mesesTrabajados ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días de Vacaciones:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateVacationDays(employeeStore.getEmployee?.empleado?.fechaDeAlta) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ employeeStore.getEmployee?.empleado?.diasVacaciones ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días Proporcionales:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateProportionalDays(employeeStore.getEmployee?.empleado?.fechaDeAlta) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ employeeStore.getEmployee?.empleado?.diasProporcionales ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días Disponibles 2025:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateAvailableDays(employeeStore.getEmployee?.empleado?.fechaDeAlta, employeeStore.getEmployee?.empleado?.diasDevengados - employeeStore.getEmployee?.empleado?.vacacionesDisponibles) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ employeeStore.getEmployee?.empleado?.diasDisponibles ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días Acumulados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateAccumulatedDays(employeeStore.getEmployee?.empleado?.fechaDeAlta, employeeStore.getEmployee?.empleado?.diasDevengados - employeeStore.getEmployee?.empleado?.vacacionesDisponibles) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ employeeStore.getEmployee?.empleado?.diasAcumulados ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                         </v-row>
@@ -196,7 +196,6 @@ import axios from 'axios';
 import { useEmployeeStore } from '@/store/employee';
 import Notification from '@/components/Notification.vue';
 import { Text } from 'vue';
-import { calculateVacationMetrics } from '@/services/vacationCalculator';
 
 export default {
   components: { Notification },
@@ -224,34 +223,6 @@ export default {
     };
   },
   methods: {
-    calculateDaysWorked(hireDate) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate).daysWorked;
-    },
-    calculateYearsWorked(hireDate) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate).yearsWorked;
-    },
-    calculateMonthsWorked(hireDate) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate).monthsWorked;
-    },
-    calculateVacationDays(hireDate) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate).vacationDays;
-    },
-    calculateProportionalDays(hireDate) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate).proportionalDays;
-    },
-    calculateAvailableDays(hireDate, daysTaken) {
-      // Always return 0 for "Días Disponibles 2025" as required
-      return 0;
-    },
-    calculateAccumulatedDays(hireDate, daysTaken) {
-      if (!hireDate) return 0;
-      return calculateVacationMetrics(hireDate, daysTaken).accumulatedDays;
-    },
     async handleLogout() {
       this.employeeStore.logout();
       this.$router.push('/login');
