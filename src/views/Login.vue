@@ -52,6 +52,7 @@
 <script>
 import axios from 'axios';
 import { useEmployeeStore } from '@/store/employee';
+import { API_BASE_URL } from '@/config/env';
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 export default {
@@ -70,7 +71,7 @@ export default {
   },
   methods: {
     async login() {
-      const endpoint = `https://elitemedicalbajio.online/rh/login?usuario=${encodeURIComponent(this.username)}&password=${encodeURIComponent(this.password)}`;
+      const endpoint = `${API_BASE_URL}/login?usuario=${encodeURIComponent(this.username)}&password=${encodeURIComponent(this.password)}`;
 
       try {
         const response = await axios.post(endpoint);

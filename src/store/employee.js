@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { connectWebSocket, disconnectWebSocket, onNotification } from '@/services/websocket';
 import axios from 'axios'; // Import axios if not already imported
+import { API_BASE_URL } from '@/config/env';
 
 export const useEmployeeStore = defineStore('employee', {
     state: () => ({
@@ -56,7 +57,7 @@ export const useEmployeeStore = defineStore('employee', {
         async fetchEmployeeDetails() {
             try {
                 if (this.employee?.empleado?.id) {
-                    const response = await axios.get(`https://elitemedicalbajio.online/rh/empleados/get/${this.employee.empleado.id}`); // Use your actual API endpoint
+                    const response = await axios.get(`${API_BASE_URL}/empleados/get/${this.employee.empleado.id}`);
                     this.employee = response.data; // Update the entire employee state
                 }
             } catch (error) {
