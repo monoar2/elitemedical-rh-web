@@ -795,7 +795,7 @@ export default {
     async fetchEmployees() {
       this.loadingEmployees = true;
       try {
-        const response = await axios.get(`${API_BASE_URL}/empleados/get`);
+        const response = await axios.get(`${API_BASE_URL}/empleados/get-metrics`);
         this.employees = response.data;
       } catch (error) {
         console.error('Error fetching employees:', error);
