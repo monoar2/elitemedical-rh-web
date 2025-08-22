@@ -1,12 +1,13 @@
 // src/services/websocket.js
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
+import { WS_URL } from '@/config/env';
 
 let stompClient = null;
 const subscribers = [];
 
 export function connectWebSocket(employeeId) {
-    const socket = new SockJS('https://elitemedicalbajio.online/rh/ws');
+    const socket = new SockJS(WS_URL);
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, () => {

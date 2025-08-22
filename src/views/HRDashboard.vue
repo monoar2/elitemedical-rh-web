@@ -193,40 +193,8 @@
                     <v-card outlined class="pa-3 mb-3">
                       <v-card-title class="text-subtitle-1 primary--text">Información de Vacaciones</v-card-title>
                       <v-card-text>
-                        <v-row v-if="newEmployee.fechaDeAlta">
-                          <v-col cols="6">
-                            <v-list-item>
-                              <v-list-item-title>Días Trabajados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateDaysWorked(newEmployee.fechaDeAlta) }}</v-list-item-subtitle>
-                            </v-list-item>
-                          </v-col>
-                          <v-col cols="6">
-                            <v-list-item>
-                              <v-list-item-title>Años Trabajados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateYearsWorked(newEmployee.fechaDeAlta) }}</v-list-item-subtitle>
-                            </v-list-item>
-                          </v-col>
-                          <v-col cols="6">
-                            <v-list-item>
-                              <v-list-item-title>Meses Trabajados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateMonthsWorked(newEmployee.fechaDeAlta) }}</v-list-item-subtitle>
-                            </v-list-item>
-                          </v-col>
-                          <v-col cols="6">
-                            <v-list-item>
-                              <v-list-item-title>Días de Vacaciones:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateVacationDays(newEmployee.fechaDeAlta) }}</v-list-item-subtitle>
-                            </v-list-item>
-                          </v-col>
-                          <v-col cols="6">
-                            <v-list-item>
-                              <v-list-item-title>Días Proporcionales:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateProportionalDays(newEmployee.fechaDeAlta) }}</v-list-item-subtitle>
-                            </v-list-item>
-                          </v-col>
-                        </v-row>
-                        <v-alert v-else type="info" dense>
-                          Seleccione una fecha de alta para ver los cálculos de vacaciones
+                        <v-alert type="info" dense>
+                          Los cálculos de vacaciones ahora son realizados por el sistema en el backend. Una vez que el empleado sea creado, las métricas se calcularán automáticamente y se mostrarán en el tablero.
                         </v-alert>
                       </v-card-text>
                     </v-card>
@@ -349,54 +317,54 @@
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días Trabajados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateDaysWorked(editingEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ editingEmployee.diasTrabajados ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Años Trabajados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateYearsWorked(editingEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ editingEmployee.anosTrabajados ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Meses Trabajados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateMonthsWorked(editingEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ editingEmployee.mesesTrabajados ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días de Vacaciones:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateVacationDays(editingEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ editingEmployee.diasVacaciones ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días Proporcionales:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateProportionalDays(editingEmployee.fechaDeAlta) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ editingEmployee.diasProporcionales ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días Tomados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateDaysTaken(editingEmployee.id) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ editingEmployee.diasTomados ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días Disponibles 2025:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateAvailableDays(editingEmployee.fechaDeAlta, calculateDaysTaken(editingEmployee.id)) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ editingEmployee.diasDisponibles ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                           <v-col cols="6">
                             <v-list-item>
                               <v-list-item-title>Días Acumulados:</v-list-item-title>
-                              <v-list-item-subtitle>{{ calculateAccumulatedDays(editingEmployee.fechaDeAlta, calculateDaysTaken(editingEmployee.id)) }}</v-list-item-subtitle>
+                              <v-list-item-subtitle>{{ editingEmployee.diasAcumulados ?? 0 }}</v-list-item-subtitle>
                             </v-list-item>
                           </v-col>
                         </v-row>
                         <v-alert v-else type="info" dense>
-                          Seleccione una fecha de alta para ver los cálculos de vacaciones
+                          Seleccione una fecha de alta para ver la información disponible de vacaciones
                         </v-alert>
                       </v-card-text>
                     </v-card>
@@ -620,6 +588,7 @@
 import axios from 'axios';
 import { useEmployeeStore } from '@/store/employee';
 import Notification from '@/components/Notification.vue';
+import { API_BASE_URL } from '@/config/env';
 
 export default {
   components: { Notification },
@@ -737,7 +706,7 @@ export default {
     async fetchRoles() {
       this.loading = true;
       try {
-        const response = await axios.get('https://elitemedicalbajio.online/rh/roles/get');
+        const response = await axios.get(`${API_BASE_URL}/roles/get`);
         this.roles = response.data;
       } catch (error) {
         console.error('Error fetching roles:', error);
@@ -749,7 +718,7 @@ export default {
     async fetchUsers() {
       this.loadingUsers = true;
       try {
-        const response = await axios.get('https://elitemedicalbajio.online/rh/usuarios/get');
+        const response = await axios.get(`${API_BASE_URL}/usuarios/get`);
         this.users = response.data;
       } catch (error) {
         console.error('Error fetching users:', error);
@@ -778,7 +747,7 @@ export default {
           empleado: { id: this.newUser.empleado.id },
         };
         try {
-          await axios.post('https://elitemedicalbajio.online/rh/usuarios/save', newUserDTO);
+          await axios.post(`${API_BASE_URL}/usuarios/save`, newUserDTO);
           this.fetchUsers();
           this.closeCreateUserModal();
           this.$toast.success('Usuario creado exitosamente!');
@@ -810,7 +779,7 @@ export default {
           empleadoId: this.editingUser.empleado.id,
         };
         try {
-          await axios.post('https://elitemedicalbajio.online/rh/usuarios/update', usuarioDTO);
+          await axios.post(`${API_BASE_URL}/usuarios/update`, usuarioDTO);
           this.fetchUsers();
           this.closeEditUserModal();
           this.$toast.success('Usuario actualizado exitosamente!');
@@ -826,7 +795,7 @@ export default {
     async fetchEmployees() {
       this.loadingEmployees = true;
       try {
-        const response = await axios.get('https://elitemedicalbajio.online/rh/empleados/get');
+        const response = await axios.get(`${API_BASE_URL}/empleados/get`);
         this.employees = response.data;
       } catch (error) {
         console.error('Error fetching employees:', error);
@@ -857,7 +826,7 @@ export default {
       if (this.$refs.createEmployeeForm.validate()) {
         this.loadingCreateEmployee = true;
         try {
-          await axios.post('https://elitemedicalbajio.online/rh/empleados/save', this.newEmployee);
+          await axios.post(`${API_BASE_URL}/empleados/save`, this.newEmployee);
           this.fetchEmployees();
           this.closeCreateEmployeeModal();
           this.$toast.success('Empleado creado exitosamente!');
@@ -881,7 +850,7 @@ export default {
       if (this.$refs.editEmployeeForm.validate()) {
         this.loadingEditEmployee = true;
         try {
-          await axios.post('https://elitemedicalbajio.online/rh/empleados/update', this.editingEmployee);
+          await axios.post(`${API_BASE_URL}/empleados/update`, this.editingEmployee);
           this.fetchEmployees();
           this.closeEditEmployeeModal();
           this.$toast.success('Empleado actualizado exitosamente!');
@@ -905,11 +874,11 @@ export default {
       this.loading = true;
       try {
         if (this.itemToDelete.type === 'user') {
-          await axios.delete(`https://elitemedicalbajio.online/rh/usuarios/delete/${this.itemToDelete.id}`);
+          await axios.delete(`${API_BASE_URL}/usuarios/delete/${this.itemToDelete.id}`);
           this.fetchUsers();
           this.$toast.success('Usuario eliminado exitosamente!');
         } else if (this.itemToDelete.type === 'employee') {
-          await axios.delete(`https://elitemedicalbajio.online/rh/empleados/delete/${this.itemToDelete.id}`);
+          await axios.delete(`${API_BASE_URL}/empleados/delete/${this.itemToDelete.id}`);
           this.fetchEmployees();
           this.$toast.success('Empleado eliminado exitosamente!');
         }
@@ -925,7 +894,7 @@ export default {
     async fetchVacationRequests() {
       this.loadingVacations = true;
       try {
-        const response = await axios.get('https://elitemedicalbajio.online/rh/vacaciones/get');
+        const response = await axios.get(`${API_BASE_URL}/vacaciones/get`);
         this.vacationRequests = response.data;
       } catch (error) {
         console.error('Error fetching vacation requests:', error);
@@ -936,7 +905,7 @@ export default {
     async approveRequest(request) {
       this.loadingApproveRejectRevoke = true;
       try {
-        await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/approve/${request.id}?empleadoId=${request.empleado.id}`);
+        await axios.post(`${API_BASE_URL}/vacaciones/approve/${request.id}?empleadoId=${request.empleado.id}`);
         await this.fetchVacationRequests();
         await this.employeeStore.fetchEmployeeDetails();
         this.$toast.success('Solicitud de vacaciones aprobada exitosamente!');
@@ -951,7 +920,7 @@ export default {
     async rejectRequest(request) {
       this.loadingApproveRejectRevoke = true;
       try {
-        await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/reject/${request.id}?empleadoId=${request.empleado.id}`);
+        await axios.post(`${API_BASE_URL}/vacaciones/reject/${request.id}?empleadoId=${request.empleado.id}`);
         await this.fetchVacationRequests();
         await this.employeeStore.fetchEmployeeDetails();
         this.$toast.success('Solicitud de vacaciones rechazada exitosamente!');
@@ -976,7 +945,7 @@ export default {
       if (this.commentingVacation && this.newComment !== null) {
         this.loadingVacations = true;
         try {
-          await axios.post(`https://elitemedicalbajio.online/rh/vacaciones/update/${this.commentingVacation.id}/comentarios`, this.newComment);
+          await axios.post(`${API_BASE_URL}/vacaciones/update/${this.commentingVacation.id}/comentarios`, this.newComment);
           this.closeCommentDialog();
           await this.fetchVacationRequests(); // Refresh the list
           this.$toast.success('Comentario guardado exitosamente!');

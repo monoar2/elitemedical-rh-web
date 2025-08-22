@@ -196,6 +196,7 @@ import axios from 'axios';
 import { useEmployeeStore } from '@/store/employee';
 import Notification from '@/components/Notification.vue';
 import { Text } from 'vue';
+import { API_BASE_URL } from '@/config/env';
 
 export default {
   components: { Notification },
@@ -229,7 +230,7 @@ export default {
     },
     async loadEmployee() {
       try {
-        const response = await axios.get(`https://elitemedicalbajio.online/rh/empleados/get/${this.employeeStore.getEmployee.empleado.id}`);
+        const response = await axios.get(`${API_BASE_URL}/empleados/get/${this.employeeStore.getEmployee.empleado.id}`);
         this.employee = response.data;
       } catch (error) {
         this.feedbackMessage = 'Error al cargar datos del empleado.';
@@ -238,7 +239,7 @@ export default {
     },
     async loadVacationTypes() {
       try {
-        const response = await axios.get('https://elitemedicalbajio.online/rh/tipo_vacacion/get');
+        const response = await axios.get(`${API_BASE_URL}/tipo_vacacion/get`);
         this.vacationTypes = response.data;
       } catch (error) {
         this.feedbackMessage = 'Error al cargar tipos de vacaciones.';
@@ -247,7 +248,7 @@ export default {
     },
     async loadVacations() {
       try {
-        const response = await axios.get(`https://elitemedicalbajio.online/rh/vacaciones/empleado/${this.employeeStore.getEmployee.empleado.id}`);
+        const response = await axios.get(`${API_BASE_URL}/vacaciones/empleado/${this.employeeStore.getEmployee.empleado.id}`);
         this.vacationList = response.data;
       } catch (error) {
         this.feedbackMessage = 'Error al cargar solicitudes de vacaciones.';
@@ -269,7 +270,7 @@ export default {
           fechaFin: this.endDate,
         };
 
-        const response = await axios.post('https://elitemedicalbajio.online/rh/vacaciones/save', request);
+        const response = await axios.post(`${API_BASE_URL}/vacaciones/save`, request);
         if (response.status === 201) {
           this.feedbackMessage = 'Solicitud de vacaciones enviada exitosamente!';
           this.feedbackType = 'success';
