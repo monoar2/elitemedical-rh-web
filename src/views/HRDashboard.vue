@@ -63,8 +63,17 @@
                 <font-awesome-icon :icon="['fas', 'address-card']" />
               </v-card-title>
               <v-card-text>
-                <v-btn color="primary" class="mb-6 elevation-2" @click="createEmployee">
+                <v-btn color="primary" class="mb-6 elevation-2 mr-2" @click="createEmployee">
                   Crear Empleado
+                </v-btn>
+                <v-btn
+                  color="orange"
+                  class="mb-6 elevation-2"
+                  :loading="loadingRecalculate"
+                  :disabled="loadingRecalculate"
+                  @click="recalculateMetrics"
+                >
+                  Recalcular métricas
                 </v-btn>
                 <v-text-field
                   v-model="searchEmpleados"
@@ -603,6 +612,7 @@ export default {
       loadingCreateUser: false,
       loadingCreateEmployee: false,
       loadingEditEmployee: false,
+      loadingRecalculate: false,
       users: [],
       employees: [],
       vacationTypes: [],
@@ -801,6 +811,19 @@ export default {
         console.error('Error fetching employees:', error);
       } finally {
         this.loadingEmployees = false;
+      }
+    },
+    async recalculateMetrics() {
+      this.loadingRecalculate = true;
+      try {
+        await axios.post(`${API_BASE_URL}/vacaciones/metrics/recalculate`, null, { headers: { Accept: '*/*' } });
+        this.$toast.success('Recalculo de métricas iniciado exitosamente.');
+        await this.fetchEmployees();
+      } catch (error) {
+        console.error('Error recalculando métricas:', error);
+        this.$toast.error('Error al recalcular métricas.');
+      } finally {
+        this.loadingRecalculate = false;
       }
     },
     createEmployee() {
